@@ -1,0 +1,43 @@
+name: clang-format-7_linux-amd64
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: get llvm-project
+      run: |
+        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-7.1.0/llvm-7.1.0.src.tar.xz
+        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-7.1.0/cfe-7.1.0.src.tar.xz
+        tar xf llvm-7.1.0.src.tar.xz
+        tar xf cfe-7.1.0.src.tar.xz
+        mkdir llvm-project-7.1.0
+        mv llvm-7.1.0.src llvm-project-7.1.0/llvm
+        mv cfe-7.1.0.src llvm-project-7.1.0/clang
+    - name: make build directory
+      run: mkdir -p llvm-project-7.1.0/build
+    - name: cmake
+      run: cd llvm-project-7.1.0/build && cmake ../llvm -DLLVM_ENABLE_PROJECTS=clang -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_CXX_FLAGS_MINSIZEREL="-Os -DNDEBUG -static -s" -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_C_COMPILER=gcc-8
+    - name: build
+      run: cd llvm-project-7.1.0/build && make clang-format -j$(nproc)
+    - name: rename output binary
+      run: |
+        cd llvm-project-7.1.0/build/bin
+        mv clang-format clang-format-7_linux-amd64
+    - name: create and print sha512sum
+      run: |
+        cd llvm-project-7.1.0/build/bin
+        sha512sum clang-format-7_linux-amd64 > clang-format-7_linux-amd64.sha512sum
+        echo "Checksum is: "
+        cat clang-format-7_linux-amd64.sha512sum
+    - name: upload release
+      uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "llvm-project-7.1.0/build/bin/clang-format-7_linux-amd64*"
+        draft: true
