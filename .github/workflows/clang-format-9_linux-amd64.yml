@@ -1,0 +1,38 @@
+name: clang-format-9_linux-amd64
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: get llvm-project
+      run: |
+        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/llvm-project-9.0.1.tar.xz
+        tar xf llvm-project-9.0.1.tar.xz
+    - name: make build directory
+      run: mkdir -p llvm-project-9.0.1/build
+    - name: cmake
+      run: cd llvm-project-9.0.1/build && cmake ../llvm -DLLVM_ENABLE_PROJECTS=clang -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_CXX_FLAGS_MINSIZEREL="-Os -DNDEBUG -static -s" -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_C_COMPILER=gcc-8
+    - name: build
+      run: cd llvm-project-9.0.1/build && make clang-format -j$(nproc)
+    - name: rename output binary
+      run: |
+        cd llvm-project-9.0.1/build/bin
+        mv clang-format clang-format-9_linux-amd64
+    - name: create and print sha512sum
+      run: |
+        cd llvm-project-9.0.1/build/bin
+        sha512sum clang-format-9_linux-amd64 > clang-format-9_linux-amd64.sha512sum
+        echo "Checksum is: "
+        cat clang-format-9_linux-amd64.sha512sum
+    - name: upload release
+      uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "llvm-project-9.0.1/build/bin/clang-format-9_linux-amd64*"
+        draft: true
