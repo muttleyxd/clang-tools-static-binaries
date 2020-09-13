@@ -1,4 +1,4 @@
-name: clang-format-6_windows-amd64
+name: clang-tools-6_windows-amd64
 
 on:
   push:

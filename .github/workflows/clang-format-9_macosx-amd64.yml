@@ -1,4 +1,4 @@
-name: clang-format-9_macosx-amd64
+name: clang-tools-9_macosx-amd64
 
 on:
   push:

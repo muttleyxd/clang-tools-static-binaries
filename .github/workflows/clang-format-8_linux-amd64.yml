@@ -1,4 +1,4 @@
-name: clang-format-8_linux-amd64
+name: clang-tools-8_linux-amd64
 
 on:
   push:
