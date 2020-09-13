@@ -22,7 +22,7 @@ jobs:
         mkdir llvm-project-3.9.1
         mv llvm-3.9.1.src llvm-project-3.9.1/llvm
         mv cfe-3.9.1.src llvm-project-3.9.1/llvm/tools/clang
-        Get-Content windows-clang-format-3.9_constify-operator.patch | patch.exe llvm-project-3.9.1/llvm/utils/TableGen/AsmWriterEmitter.cpp
+        Get-Content windows-clang-3.9_constify-operator.patch | patch.exe llvm-project-3.9.1/llvm/utils/TableGen/AsmWriterEmitter.cpp
         mv clang-tools-extra-3.9.1.src llvm-project-3.9.1/llvm/tools/clang/tools/extra
     - name: make build directory
       run: mkdir -p llvm-project-3.9.1/build
