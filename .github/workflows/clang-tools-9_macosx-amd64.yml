@@ -1,4 +1,4 @@
-name: clang-format-9_macosx-amd64
+name: clang-tools-9_macosx-amd64
 
 on:
   push:
@@ -16,9 +16,9 @@ jobs:
     - name: make build directory
       run: mkdir -p llvm-project-9.0.1/build
     - name: cmake
-      run: cd llvm-project-9.0.1/build && cmake ../llvm -DLLVM_ENABLE_PROJECTS=clang -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_CXX_FLAGS_MINSIZEREL="-Os -s -DNDEBUG -static-libgcc -static-libstdc++" -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
+      run: cd llvm-project-9.0.1/build && cmake ../llvm -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_CXX_FLAGS_MINSIZEREL="-Os -s -DNDEBUG -static-libgcc -static-libstdc++" -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
     - name: build
-      run: cd llvm-project-9.0.1/build && make clang-format -j$(sysctl -n hw.ncpu)
+      run: cd llvm-project-9.0.1/build && make clang-format clang-query clang-tidy -j$(sysctl -n hw.ncpu)
     - name: print dependencies
       run: otool -L llvm-project-9.0.1/build/bin/clang-format
     - name: rename output binary
@@ -29,12 +29,12 @@ jobs:
       run: |
         cd llvm-project-9.0.1/build/bin
         shasum -a512 clang-format-9_macosx-amd64 > clang-format-9_macosx-amd64.sha512sum
-        echo "Checksum is: "
+        echo "Checksums are: "
         cat clang-format-9_macosx-amd64.sha512sum
     - name: upload release
       uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        file: "llvm-project-9.0.1/build/bin/clang-format-9_macosx-amd64*"
+        file: "llvm-project-9.0.1/build/bin/clang-*-9_macosx-amd64*"
         draft: true

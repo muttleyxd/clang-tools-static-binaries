@@ -1,0 +1,44 @@
+name: clang-tools-10_linux-amd64
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: get llvm-project
+      run: |
+        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.1/llvm-project-10.0.1.tar.xz
+        tar xf llvm-project-10.0.1.tar.xz
+    - name: make build directory
+      run: mkdir -p llvm-project-10.0.1/build
+    - name: cmake
+      run: cd llvm-project-10.0.1/build && cmake ../llvm -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_CXX_FLAGS_MINSIZEREL="-Os -DNDEBUG -static -s -flto" -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_C_COMPILER=gcc-8
+    - name: build
+      run: cd llvm-project-10.0.1/build && make clang-format clang-query clang-tidy -j$(nproc)
+    - name: rename output binary
+      run: |
+        cd llvm-project-10.0.1/build/bin
+        mv clang-format clang-format-10_linux-amd64
+        mv clang-query clang-query-10_linux-amd64
+        mv clang-tidy clang-tidy-10_linux-amd64
+    - name: create and print sha512sum
+      run: |
+        cd llvm-project-10.0.1/build/bin
+        sha512sum clang-format-10_linux-amd64 > clang-format-10_linux-amd64.sha512sum
+        sha512sum clang-query-10_linux-amd64 > clang-query-10_linux-amd64.sha512sum
+        sha512sum clang-tidy-10_linux-amd64 > clang-tidy-10_linux-amd64.sha512sum
+        echo "Checksums are: "
+        cat clang-format-10_linux-amd64.sha512sum
+        cat clang-query-10_linux-amd64.sha512sum
+        cat clang-tidy-10_linux-amd64.sha512sum
+    - name: upload release
+      uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "llvm-project-10.0.1/build/bin/clang-*-10_linux-amd64*"
+        draft: true
