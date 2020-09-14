@@ -1,8 +1,8 @@
-# clang-format static binaries
+# clang-tools (clang-format, clang-query, clang-tidy) static binaries
 
 ## Download
 
-Grab clang-format static binaries for your platform from [Releases](https://github.com/muttleyxd/clang-format-static-binaries/releases) tab!
+Grab clang-tools static binaries for your platform from [Releases](https://github.com/muttleyxd/clang-format-static-binaries/releases) tab!
 
 ## Motivation behind this repo
 
@@ -21,6 +21,6 @@ These binaries aim to:
 - Fork this repository and run GitHub actions on your behalf
 - Build manually using steps using commands from [.github/workflows](https://github.com/muttleyxd/clang-format-static-binaries/tree/master/.github/workflows)
 
-## More clang-format
+## More clang-tools
 
-If there's any interest I could add more builds or a build for new OS (ex. FreeBSD)
+If there's any interest I could add more tools, or a build for new OS (ex. FreeBSD)
