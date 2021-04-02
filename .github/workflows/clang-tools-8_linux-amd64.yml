@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: get llvm-project
@@ -21,10 +21,11 @@ jobs:
         mv llvm-8.0.1.src llvm-project-8.0.1/llvm
         mv cfe-8.0.1.src llvm-project-8.0.1/clang
         mv clang-tools-extra-8.0.1.src llvm-project-8.0.1/clang-tools-extra
+        patch llvm-project-8.0.1/llvm/include/llvm/Demangle/MicrosoftDemangleNodes.h include-cstdint-string-prior-to-using-uint8_t.patch
     - name: make build directory
       run: mkdir -p llvm-project-8.0.1/build
     - name: cmake
-      run: cd llvm-project-8.0.1/build && cmake ../llvm -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=MinSizeRel -DLLVM_BUILD_STATIC=ON -DCMAKE_CXX_FLAGS="-s -flto" -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_C_COMPILER=gcc-8
+      run: cd llvm-project-8.0.1/build && cmake ../llvm -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=MinSizeRel -DLLVM_BUILD_STATIC=ON -DCLANG_ANALYZER_ENABLE_Z3_SOLVER=OFF -DCMAKE_CXX_FLAGS="-s -flto" -DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_C_COMPILER=gcc-10
     - name: build
       run: cd llvm-project-8.0.1/build && make clang-format clang-query clang-tidy -j$(nproc)
     - name: rename output binary
