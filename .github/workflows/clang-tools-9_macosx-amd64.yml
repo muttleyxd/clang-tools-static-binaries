@@ -25,12 +25,18 @@ jobs:
       run: |
         cd llvm-project-9.0.1/build/bin
         mv clang-format clang-format-9_macosx-amd64
+        mv clang-query clang-query-9_macosx-amd64
+        mv clang-tidy clang-tidy-9_macosx-amd64
     - name: create and print sha512sum
       run: |
         cd llvm-project-9.0.1/build/bin
         shasum -a512 clang-format-9_macosx-amd64 > clang-format-9_macosx-amd64.sha512sum
+        shasum -a512 clang-query-9_macosx-amd64 > clang-query-9_macosx-amd64.sha512sum
+        shasum -a512 clang-tidy-9_macosx-amd64 > clang-tidy-9_macosx-amd64.sha512sum
         echo "Checksums are: "
         cat clang-format-9_macosx-amd64.sha512sum
+        cat clang-query-9_macosx-amd64.sha512sum
+        cat clang-tidy-9_macosx-amd64.sha512sum
     - name: upload release
       uses: xresloader/upload-to-github-release@v1
       env:
