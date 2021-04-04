@@ -1,0 +1,169 @@
+name: clang-tools-static-amd64
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10 ]
+        os: [ linux, macosx, windows ]
+        include:
+          - clang-version: 3.9
+            release: llvm-project-3.9.1
+          - clang-version: 4
+            release: llvm-project-4.0.1
+          - clang-version: 5
+            release: llvm-project-5.0.2
+          - clang-version: 6
+            release: llvm-project-6.0.1
+          - clang-version: 7
+            release: llvm-project-7.1.0
+          - clang-version: 8
+            release: llvm-project-8.0.1
+            extra-cmake-args: '-DCLANG_ANALYZER_ENABLE_Z3_SOLVER=OFF'
+          - clang-version: 9
+            release: llvm-project-9.0.1
+            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
+          - clang-version: 10
+            release: llvm-project-10.0.1
+            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
+          - os: linux
+            runner: ubuntu-20.04
+            get-ver: 'version=${RELEASE##llvm-project-}; version=${version%.src}; version=${version/rc/-rc}'
+            os-cmake-args: '-DLLVM_BUILD_STATIC=ON -DCMAKE_CXX_FLAGS="-s -flto" ${POSIX_CMAKE_ARGS}'
+            build-args: '-j$(nproc)'
+            bindir: '/build/bin'
+            dotexe: ''
+            shacmd: 'sha512sum'
+          - os: macosx
+            runner: macos-latest
+            get-ver: 'version=${RELEASE##llvm-project-}; version=${version%.src}; version=${version/rc/-rc}'
+            os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 ${POSIX_CMAKE_ARGS}'
+            build-args: '-j$(sysctl -n hw.ncpu)'
+            bindir: '/build/bin'
+            dotexe: ''
+            shacmd: 'shasum -a512'
+          - os: windows
+            runner: windows-latest
+            set-env: '$env:Path = "C:\Program Files\Git\usr\bin;$env:Path"'
+            get-ver: '$version = $env:RELEASE -replace "^llvm-project-" -replace ".src$" -replace "rc", "-rc"'
+            os-cmake-args: '-Thost=x64 -DCMAKE_CXX_FLAGS="/MP /std:c++14" -DLLVM_USE_CRT_MINSIZEREL="MT"'
+            build-args: '--config MinSizeRel'
+            bindir: '/build/MinSizeRel/bin'
+            dotexe: '.exe'
+            shacmd: 'sha512sum.exe'
+            extra-tar-args: '--exclude=${env:RELEASE}/clang/test/Driver/Inputs/* --exclude=${env:RELEASE}/libcxx/test/std/input.output/filesystems/Inputs/static_test_env/* --exclude=${env:RELEASE}/libclc/amdgcn-mesa3d'
+            extra-tar-args-cfe: '--exclude=cfe-${version}.src/test/Driver/Inputs/*'
+    runs-on: ${{ matrix.runner }}
+    env:
+      COMMON_CMAKE_ARGS: '-DBUILD_SHARED_LIBS=OFF -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"'
+      POSIX_CMAKE_ARGS: '-DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_C_COMPILER=gcc-10'
+      RELEASE: '${{ matrix.release }}'
+      suffix: '${{ matrix.clang-version }}_${{ matrix.os }}-amd64'
+    steps:
+    - uses: actions/checkout@v2
+    - name: install wget
+      if: ${{ matrix.os == 'windows' }}
+      run: choco install wget
+    - name: get llvm-project
+      if: ${{ matrix.clang-version < 7 }}
+      run: |
+        ${{ matrix.get-ver }}
+        wget https://releases.llvm.org/${version}/llvm-${version}.src.tar.xz
+        wget https://releases.llvm.org/${version}/cfe-${version}.src.tar.xz
+        wget https://releases.llvm.org/${version}/clang-tools-extra-${version}.src.tar.xz
+    - name: get llvm-project
+      if: ${{ matrix.clang-version == 7 || matrix.clang-version == 8 }}
+      run: |
+        ${{ matrix.get-ver }}
+        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/llvm-${version}.src.tar.xz
+        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/cfe-${version}.src.tar.xz
+        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/clang-tools-extra-${version}.src.tar.xz
+    - name: get llvm-project
+      if: ${{ matrix.clang-version >= 9 }}
+      run: |
+        ${{ matrix.get-ver }}
+        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/${{ matrix.release }}.tar.xz
+
+    - name: unpack llvm-project
+      if: ${{ matrix.clang-version < 9 }}
+      run: |
+        ${{ matrix.get-ver }}
+        ${{ matrix.set-env }}
+        tar xf llvm-${version}.src.tar.xz
+        tar xf cfe-${version}.src.tar.xz ${{ matrix.extra-tar-args-cfe }}
+        tar xf clang-tools-extra-${version}.src.tar.xz
+        mkdir ${{ matrix.release }}
+        mv llvm-${version}.src ${{ matrix.release }}/llvm
+        mv cfe-${version}.src ${{ matrix.release }}/clang
+        mv clang-tools-extra-${version}.src ${{ matrix.release }}/clang-tools-extra
+    - name: move clang 3.9 sources
+      if: ${{ matrix.clang-version == 3.9 }}
+      run: |
+        mv ${{ matrix.release }}/clang ${{ matrix.release }}/llvm/tools/clang
+        mv ${{ matrix.release }}/clang-tools-extra ${{ matrix.release }}/llvm/tools/clang/tools/extra
+    - name: unpack llvm-project
+      if: ${{ matrix.clang-version >= 9 }}
+      run: |
+        ${{ matrix.set-env }}
+        tar xf ${{ matrix.release }}.tar.xz ${{ matrix.extra-tar-args }}
+
+    - name: patch clang-3.9 constify operator
+      if: ${{ matrix.clang-version == 3.9 && matrix.os == 'windows' }}
+      run: patch ${{ matrix.release }}/llvm/utils/TableGen/AsmWriterEmitter.cpp windows-clang-3.9_constify-operator.patch
+    - name: patch clang-8 includes
+      if: ${{ matrix.clang-version == 8 }}
+      run: patch ${{ matrix.release }}/llvm/include/llvm/Demangle/MicrosoftDemangleNodes.h include-cstdint-string-prior-to-using-uint8_t.patch
+    - name: patch trivially-copyable clang 9/10
+      if: ${{ ( matrix.clang-version == 9 || matrix.clang-version == 10 ) && matrix.os == 'windows' }}
+      run: patch ${{ matrix.release }}/llvm/cmake/config-ix.cmake windows-clang-9-10-trivially-copyable-mismatch.patch
+    - name: cmake
+      run: cmake -S ${{ matrix.release }}/llvm -B ${{ matrix.release }}/build ${{ env.COMMON_CMAKE_ARGS }} ${{ matrix.os-cmake-args }} ${{ matrix.extra-cmake-args }}
+    - name: build
+      run: cmake --build ${{ matrix.release }}/build ${{ matrix.build-args }} --target clang-format clang-query clang-tidy
+    - name: print dependencies
+      if: ${{ matrix.os == 'macosx' }}
+      run: otool -L ${{ matrix.release }}/build/bin/clang-format
+    - name: rename output binary
+      run: |
+        cd ${{ matrix.release }}${{ matrix.bindir }}
+        mv clang-format${{ matrix.dotexe }} clang-format-${{ env.suffix }}${{ matrix.dotexe }}
+        mv clang-query${{ matrix.dotexe }} clang-query-${{ env.suffix }}${{ matrix.dotexe }}
+        mv clang-tidy${{ matrix.dotexe }} clang-tidy-${{ env.suffix }}${{ matrix.dotexe }}
+    - name: create and print sha512sum
+      run: |
+        ${{ matrix.set-env }}
+        cd ${{ matrix.release }}${{ matrix.bindir }}
+        ${{ matrix.shacmd }} clang-format-${{ env.suffix }} > clang-format-${{ env.suffix }}.sha512sum
+        ${{ matrix.shacmd }} clang-query-${{ env.suffix }} > clang-query-${{ env.suffix }}.sha512sum
+        ${{ matrix.shacmd }} clang-tidy-${{ env.suffix }} > clang-tidy-${{ env.suffix }}.sha512sum
+        echo "Checksums are: "
+        cat clang-format-${{ env.suffix }}.sha512sum
+        cat clang-query-${{ env.suffix }}.sha512sum
+        cat clang-tidy-${{ env.suffix }}.sha512sum
+    - name: upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: clang-tools
+        path: "${{ matrix.release }}${{ matrix.bindir }}/clang-*-${{ env.suffix }}*"
+        retention-days: 1
+  draft-release:
+    runs-on: ubuntu-20.04
+    needs: build
+    steps:
+      - name: download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: clang-tools
+      - name: list files
+        run: ls -laR .
+      - name: draft release
+        uses: xresloader/upload-to-github-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: "clang-*"
+          draft: true
