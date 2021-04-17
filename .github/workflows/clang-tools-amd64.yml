@@ -69,28 +69,25 @@ jobs:
       suffix: '${{ matrix.clang-version }}_${{ matrix.os }}-amd64'
     steps:
     - uses: actions/checkout@v2
-    - name: install wget
-      if: ${{ matrix.os == 'windows' }}
-      run: choco install wget
     - name: get llvm-project
       if: ${{ matrix.clang-version < 7 }}
       run: |
         ${{ matrix.get-ver }}
-        wget https://releases.llvm.org/${version}/llvm-${version}.src.tar.xz
-        wget https://releases.llvm.org/${version}/cfe-${version}.src.tar.xz
-        wget https://releases.llvm.org/${version}/clang-tools-extra-${version}.src.tar.xz
+        curl -LO https://releases.llvm.org/${version}/llvm-${version}.src.tar.xz
+        curl -LO https://releases.llvm.org/${version}/cfe-${version}.src.tar.xz
+        curl -LO https://releases.llvm.org/${version}/clang-tools-extra-${version}.src.tar.xz
     - name: get llvm-project
       if: ${{ matrix.clang-version == 7 || matrix.clang-version == 8 }}
       run: |
         ${{ matrix.get-ver }}
-        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/llvm-${version}.src.tar.xz
-        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/cfe-${version}.src.tar.xz
-        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/clang-tools-extra-${version}.src.tar.xz
+        curl -LO https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/llvm-${version}.src.tar.xz
+        curl -LO https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/cfe-${version}.src.tar.xz
+        curl -LO https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/clang-tools-extra-${version}.src.tar.xz
     - name: get llvm-project
       if: ${{ matrix.clang-version >= 9 }}
       run: |
         ${{ matrix.get-ver }}
-        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/${{ matrix.release }}.tar.xz
+        curl -LO https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/${{ matrix.release }}.tar.xz
 
     - name: unpack llvm-project
       if: ${{ matrix.clang-version < 9 }}
