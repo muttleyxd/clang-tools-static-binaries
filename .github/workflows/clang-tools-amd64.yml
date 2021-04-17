@@ -8,7 +8,7 @@ jobs:
   build:
     strategy:
       matrix:
-        clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10 ]
+        clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]
         os: [ linux, macosx, windows ]
         include:
           - clang-version: 3.9
@@ -30,6 +30,10 @@ jobs:
           - clang-version: 10
             release: llvm-project-10.0.1
             extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
+          - clang-version: 11
+            release: llvm-project-11.1.0.src
+          - clang-version: 12
+            release: llvm-project-12.0.0.src
           - os: linux
             runner: ubuntu-20.04
             get-ver: 'version=${RELEASE##llvm-project-}; version=${version%.src}; version=${version/rc/-rc}'
