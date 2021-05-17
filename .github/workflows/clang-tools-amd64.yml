@@ -127,6 +127,10 @@ jobs:
       if: ${{ ( matrix.clang-version == 9 || matrix.clang-version == 10 ) && matrix.os == 'windows' }}
       shell: bash
       run: patch ${{ matrix.release }}/llvm/cmake/config-ix.cmake windows-clang-9-10-trivially-copyable-mismatch.patch
+    - name: patch cmake implicit link libraries on macosx
+      if: ${{ matrix.os == 'macosx' }}
+      shell: bash
+      run: sed -i.backup 's/gcc_eh.\*|/gcc_eh.*|gcc_ext.*|/g' $(find /usr/local/Cellar -name CMakeParseImplicitLinkInfo.cmake)
     - name: cmake
       run: cmake -S ${{ matrix.release }}/llvm -B ${{ matrix.release }}/build ${{ env.COMMON_CMAKE_ARGS }} ${{ matrix.os-cmake-args }} ${{ matrix.extra-cmake-args }}
     - name: build
