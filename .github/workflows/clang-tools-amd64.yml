@@ -88,7 +88,7 @@ jobs:
         curl -LO https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/cfe-${version}.src.tar.xz
         curl -LO https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/clang-tools-extra-${version}.src.tar.xz
     - name: get llvm-project
-      if: ${{ matrix.clang-version >= 9 }}
+      if: ${{ matrix.clang-version >= 9 || matrix.clang-version == '12.0.1' }}
       shell: bash
       run: |
         version=${RELEASE##llvm-project-}; version=${version%.src}
@@ -112,7 +112,7 @@ jobs:
         mv ${{ matrix.release }}/clang ${{ matrix.release }}/llvm/tools/clang
         mv ${{ matrix.release }}/clang-tools-extra ${{ matrix.release }}/llvm/tools/clang/tools/extra
     - name: unpack llvm-project
-      if: ${{ matrix.clang-version >= 9 }}
+      if: ${{ matrix.clang-version >= 9 || matrix.clang-version == '12.0.1' }}
       shell: bash
       run: |
         tar xf ${{ matrix.release }}.tar.xz ${{ matrix.extra-tar-args }}
