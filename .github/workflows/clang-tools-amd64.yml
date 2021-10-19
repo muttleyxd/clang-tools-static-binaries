@@ -8,7 +8,7 @@ jobs:
   build:
     strategy:
       matrix:
-        clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12.0.1 ]
+        clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12.0.1, 13 ]
         os: [ linux, macosx, windows ]
         include:
           - clang-version: 3.9
@@ -36,6 +36,8 @@ jobs:
             release: llvm-project-12.0.0.src
           - clang-version: 12.0.1
             release: llvm-project-12.0.1.src
+          - clang-version: 13
+            release: llvm-project-13.0.0.src
           - os: linux
             runner: ubuntu-20.04
             os-cmake-args: '-DLLVM_BUILD_STATIC=ON -DCMAKE_CXX_FLAGS="-s -flto" ${POSIX_CMAKE_ARGS}'
@@ -88,7 +90,7 @@ jobs:
         curl -LO https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/cfe-${version}.src.tar.xz
         curl -LO https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/clang-tools-extra-${version}.src.tar.xz
     - name: get llvm-project
-      if: ${{ matrix.clang-version >= 9 }}
+      if: ${{ matrix.clang-version >= 9 || matrix.clang-version == '12.0.1' }}
       shell: bash
       run: |
         version=${RELEASE##llvm-project-}; version=${version%.src}
@@ -112,7 +114,7 @@ jobs:
         mv ${{ matrix.release }}/clang ${{ matrix.release }}/llvm/tools/clang
         mv ${{ matrix.release }}/clang-tools-extra ${{ matrix.release }}/llvm/tools/clang/tools/extra
     - name: unpack llvm-project
-      if: ${{ matrix.clang-version >= 9 }}
+      if: ${{ matrix.clang-version >= 9 || matrix.clang-version == '12.0.1' }}
       shell: bash
       run: |
         tar xf ${{ matrix.release }}.tar.xz ${{ matrix.extra-tar-args }}
