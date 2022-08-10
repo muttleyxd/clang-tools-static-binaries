@@ -1,8 +1,8 @@
-# clang-tools (clang-format, clang-query, clang-tidy) static binaries
+# clang-tools (clang-format, clang-tidy) static binaries
 
-## Download
+<!-- ## Download
 
-Grab clang-tools static binaries for your platform from [Releases](https://github.com/muttleyxd/clang-format-static-binaries/releases) tab!
+Grab clang-tools static binaries for your platform from [Releases](https://github.com/muttleyxd/clang-format-static-binaries/releases) tab! -->
 
 ## Motivation behind this repo
 
@@ -12,6 +12,7 @@ I could either compile clang-format for each one I want to have or I could try m
 This can very quickly get out of hand, hence I created this repository.
 
 These binaries aim to:
+
 - be as small as possible
 - not require any additional dependencies apart from OS itself
 
@@ -19,7 +20,7 @@ These binaries aim to:
 
 - Verify sha512sums of binaries against output from GitHub Actions to make sure binaries are not modified
 - Fork this repository and run GitHub actions on your behalf
-- Build manually using steps using commands from [.github/workflows](https://github.com/muttleyxd/clang-format-static-binaries/tree/master/.github/workflows)
+- Build manually using steps using commands from [.github/workflows](https://github.com/cpp-linter/clang-tools-static-binaries/tree/master/.github/workflows)
 
 ## More clang-tools
 
