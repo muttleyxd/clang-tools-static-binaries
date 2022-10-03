@@ -3,7 +3,9 @@ name: clang-tools-static-amd64
 on:
   push:
     branches: [ master ]
-
+  pull_request:
+    branches:
+      - master
 jobs:
   build:
     strategy:
