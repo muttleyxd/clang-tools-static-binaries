@@ -8,7 +8,7 @@ jobs:
   build:
     strategy:
       matrix:
-        clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12.0.1, 13, 14, 15, 16 ]
+        clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12.0.1, 13, 14, 15, 16, 17 ]
         os: [ linux, macosx, windows ]
         include:
           - clang-version: 3.9
@@ -44,6 +44,8 @@ jobs:
             release: llvm-project-15.0.2.src
           - clang-version: 16
             release: llvm-project-16.0.3.src
+          - clang-version: 17
+            release: llvm-project-17.0.4.src
           - os: linux
             runner: ubuntu-20.04
             os-cmake-args: '-DLLVM_BUILD_STATIC=ON -DCMAKE_CXX_FLAGS="-s -flto" ${POSIX_CMAKE_ARGS}'
