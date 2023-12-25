@@ -165,7 +165,7 @@ jobs:
       - name: draft release
         uses: xresloader/upload-to-github-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           file: "clang-*"
           draft: true
