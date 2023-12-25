@@ -3,22 +3,15 @@ name: clang-tools-static-amd64
 on:
   push:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build:
     strategy:
       matrix:
-        clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12.0.1, 13, 14, 15, 16, 17 ]
+        clang-version: [ 7, 8, 9, 10, 11, 12, 12.0.1, 13, 14, 15, 16, 17 ]
         os: [ linux, macosx, windows ]
         include:
-          - clang-version: 3.9
-            release: llvm-project-3.9.1
-          - clang-version: 4
-            release: llvm-project-4.0.1
-          - clang-version: 5
-            release: llvm-project-5.0.2
-          - clang-version: 6
-            release: llvm-project-6.0.1
           - clang-version: 7
             release: llvm-project-7.1.0
           - clang-version: 8
@@ -47,7 +40,7 @@ jobs:
           - clang-version: 17
             release: llvm-project-17.0.4.src
           - os: linux
-            runner: ubuntu-20.04
+            runner: ubuntu-22.04
             os-cmake-args: '-DLLVM_BUILD_STATIC=ON -DCMAKE_CXX_FLAGS="-s -flto" ${POSIX_CMAKE_ARGS}'
             build-args: '-j$(nproc)'
             bindir: '/build/bin'
@@ -55,7 +48,7 @@ jobs:
             shacmd: 'sha512sum'
           - os: macosx
             runner: macos-11
-            os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 ${POSIX_CMAKE_ARGS}'
+            os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto" -DCMAKE_OSX_DEPLOYMENT_TARGET=11 ${POSIX_CMAKE_ARGS}'
             build-args: '-j$(sysctl -n hw.ncpu)'
             bindir: '/build/bin'
             dotexe: ''
@@ -81,14 +74,6 @@ jobs:
       # the commit hash of this repository into the clang binaries
       shell: bash
       run: curl -L https://github.com/${{ github.repository }}/archive/${{ github.ref }}.tar.gz | tar xvz --strip 1
-    - name: get llvm-project
-      if: ${{ matrix.clang-version < 7 }}
-      shell: bash
-      run: |
-        version=${RELEASE##llvm-project-}
-        curl -LO https://releases.llvm.org/${version}/llvm-${version}.src.tar.xz
-        curl -LO https://releases.llvm.org/${version}/cfe-${version}.src.tar.xz
-        curl -LO https://releases.llvm.org/${version}/clang-tools-extra-${version}.src.tar.xz
     - name: get llvm-project
       if: ${{ matrix.clang-version == 7 || matrix.clang-version == 8 }}
       shell: bash
@@ -116,21 +101,11 @@ jobs:
         mv llvm-${version}.src ${{ matrix.release }}/llvm
         mv cfe-${version}.src ${{ matrix.release }}/clang
         mv clang-tools-extra-${version}.src ${{ matrix.release }}/clang-tools-extra
-    - name: move clang 3.9 sources
-      if: ${{ matrix.clang-version == 3.9 }}
-      run: |
-        mv ${{ matrix.release }}/clang ${{ matrix.release }}/llvm/tools/clang
-        mv ${{ matrix.release }}/clang-tools-extra ${{ matrix.release }}/llvm/tools/clang/tools/extra
     - name: unpack llvm-project
       if: ${{ matrix.clang-version >= 9 || matrix.clang-version == '12.0.1' }}
       shell: bash
       run: |
         tar xf ${{ matrix.release }}.tar.xz ${{ matrix.extra-tar-args }}
-
-    - name: patch clang-3.9 constify operator
-      if: ${{ matrix.clang-version == 3.9 && matrix.os == 'windows' }}
-      shell: bash
-      run: patch ${{ matrix.release }}/llvm/utils/TableGen/AsmWriterEmitter.cpp windows-clang-3.9_constify-operator.patch
     - name: patch clang-8 includes
       if: ${{ matrix.clang-version == 8 }}
       shell: bash
