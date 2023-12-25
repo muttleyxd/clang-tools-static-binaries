@@ -3,6 +3,8 @@ name: clang-tools-static-amd64
 on:
   push:
     branches: [ master ]
+    paths:
+      - ".github/workflows/clang-tools-amd64.yml"
   workflow_dispatch:
 
 jobs:
