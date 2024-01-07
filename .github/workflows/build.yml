@@ -1,4 +1,4 @@
-name: clang-tools-static-amd64
+name: Build
 
 on:
   push:
