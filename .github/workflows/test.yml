@@ -5,7 +5,7 @@ on:
     branches: [ master ]
   workflow_dispatch:
 
-job:
+jobs:
   install:
     strategy:
       matrix:
