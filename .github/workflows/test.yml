@@ -7,24 +7,24 @@ on:
 
 job:
   install:
-  strategy:
-    matrix:
-      version: [ 7, 8, 9, 10, 11, 12, 12.0.1, 13, 14, 15, 16, 17 ]
-      tool: [ clang-format, clang-tidy, clang-query ]
-      os_name: [ linux, windows, macosx ]
-      os: [ ubuntu-latest, macos-latest, windows-latest ]
-    fail-fast: false
-  runs-on: ${{ matrix.os }}
-  steps:
-    - name: Download and check ${{ matrix.tool }}-${{ matrix.version }} on Windows
-      if: matrix.os == 'windows-latest'
-      shell: bash
-      run: |
-        gh release download --pattern '${{ matrix.tool }}-${{ matrix.version }}_${{ matrix.os_name }}-amd64.exe'
-        ./${{ matrix.tool }}-${{ matrix.version }}_${{ matrix.os_name }}-amd64.exe --version
+    strategy:
+      matrix:
+        version: [ 7, 8, 9, 10, 11, 12, 12.0.1, 13, 14, 15, 16, 17 ]
+        tool: [ clang-format, clang-tidy, clang-query ]
+        os_name: [ linux, windows, macosx ]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Download and check ${{ matrix.tool }}-${{ matrix.version }} on Windows
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: |
+          gh release download --pattern '${{ matrix.tool }}-${{ matrix.version }}_${{ matrix.os_name }}-amd64.exe'
+          ./${{ matrix.tool }}-${{ matrix.version }}_${{ matrix.os_name }}-amd64.exe --version
 
-    - name: Download and check ${{ matrix.tool }}-${{ matrix.version }} on Unix
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
-      run: |
-        gh release download --pattern '${{ matrix.tool }}-${{ matrix.version }}_${{ matrix.os_name }}-amd64'
-        ./${{ matrix.tool }}-${{ matrix.version }}_${{ matrix.os_name }}-amd64 --version
+      - name: Download and check ${{ matrix.tool }}-${{ matrix.version }} on Unix
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        run: |
+          gh release download --pattern '${{ matrix.tool }}-${{ matrix.version }}_${{ matrix.os_name }}-amd64'
+          ./${{ matrix.tool }}-${{ matrix.version }}_${{ matrix.os_name }}-amd64 --version
