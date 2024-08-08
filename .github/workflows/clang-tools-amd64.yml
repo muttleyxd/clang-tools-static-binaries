@@ -47,7 +47,7 @@ jobs:
           - clang-version: 17
             release: llvm-project-17.0.4.src
           - clang-version: 18
-            release: llvm-project-18.1.3.src
+            release: llvm-project-18.1.8.src
           - os: linux
             runner: ubuntu-20.04
             os-cmake-args: '-DLLVM_BUILD_STATIC=ON -DCMAKE_CXX_FLAGS="-s -flto" ${POSIX_CMAKE_ARGS}'
