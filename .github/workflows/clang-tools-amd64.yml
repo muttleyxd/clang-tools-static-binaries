@@ -145,6 +145,11 @@ jobs:
       if: ${{ ( matrix.clang-version == 9 || matrix.clang-version == 10 ) && matrix.os == 'windows' }}
       shell: bash
       run: patch ${{ matrix.release }}/llvm/cmake/config-ix.cmake windows-clang-9-10-trivially-copyable-mismatch.patch
+    - name: macos dependencies
+      if: ${{ matrix.os == 'macosx' }}
+      run: |
+        export HOMEBREW_NO_AUTO_UPDATE=1
+        brew install gcc@14
     - name: patch cmake implicit link libraries on macosx
       if: ${{ matrix.os == 'macosx' }}
       shell: bash
