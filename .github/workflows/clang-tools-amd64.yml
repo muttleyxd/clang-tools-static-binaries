@@ -150,8 +150,8 @@ jobs:
       run: |
         echo $PATH
         #echo "PATH=$(brew --prefix)/bin:$PATH" >> $GITHUB_ENV
-        which gcc-11
-        which g++-11
+        which gcc-14
+        which g++-14
     - name: patch cmake implicit link libraries on macosx
       if: ${{ matrix.os == 'macosx' }}
       shell: bash
