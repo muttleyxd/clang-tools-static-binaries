@@ -179,7 +179,7 @@ jobs:
     - name: upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: clang-tools
+        name: clang-tools-${{ matrix.release }}-${{ matrix.bindir }}-${{ env.suffix }}
         path: "${{ matrix.release }}${{ matrix.bindir }}/clang-*-${{ env.suffix }}*"
         retention-days: 1
   draft-release:
@@ -189,7 +189,7 @@ jobs:
       - name: download artifacts
         uses: actions/download-artifact@v2
         with:
-          name: clang-tools
+          name: clang-tools-${{ matrix.release }}-${{ matrix.bindir }}-${{ env.suffix }}
       - name: list files
         run: ls -laR .
       - name: draft release
