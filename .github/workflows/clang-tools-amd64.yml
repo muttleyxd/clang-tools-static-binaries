@@ -187,7 +187,7 @@ jobs:
     needs: build
     steps:
       - name: download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: clang-tools-${{ matrix.release }}-${{ env.suffix }}
       - name: list files
