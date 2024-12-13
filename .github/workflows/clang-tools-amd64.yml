@@ -191,7 +191,7 @@ jobs:
       - name: list files
         run: ls -laR .
       - name: draft release
-        uses: xresloader/upload-to-github-release@v1
+        uses: xresloader/upload-to-github-release@v1.6.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
