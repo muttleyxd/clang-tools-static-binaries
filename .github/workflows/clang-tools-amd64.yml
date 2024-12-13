@@ -191,9 +191,15 @@ jobs:
       - name: list files
         run: ls -laR .
       - name: draft release
-        uses: xresloader/upload-to-github-release@v1.6.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: svenstaro/upload-release-action@v2
         with:
-          file: "clang-*/**/*"
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           draft: true
+          file_glob: true
+          file: clang-*/**/*
+        #uses: xresloader/upload-to-github-release@v1.6.0
+        #with:
+          #file: "clang-*/**/*"
+          #draft: true
