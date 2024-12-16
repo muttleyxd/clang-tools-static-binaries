@@ -190,6 +190,8 @@ jobs:
         uses: actions/download-artifact@v4
       - name: list files
         run: ls -laR .
+      - name: Workaround - delete all files over 2G, above github release file upload limit
+        run: find . -type f -size +2G -exec rm -v {} \;
       - name: draft release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -199,7 +201,3 @@ jobs:
           draft: true
           file_glob: true
           file: clang-*/**/*
-        #uses: xresloader/upload-to-github-release@v1.6.0
-        #with:
-          #file: "clang-*/**/*"
-          #draft: true
