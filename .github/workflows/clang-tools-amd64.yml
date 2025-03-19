@@ -63,6 +63,8 @@ jobs:
             #shacmd: 'sha512sum'
             #arch: 'amd64'
           - os: macosx
+            # Uses a macOS amd image here
+            # https://github.com/actions/runner-images
             runner: macos-13
             os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 ${POSIX_CMAKE_ARGS} ${MACOS_CMAKE_ARGS}'
             build-args: '-j$(sysctl -n hw.ncpu)'
@@ -71,6 +73,8 @@ jobs:
             shacmd: 'shasum -a512'
             arch: 'amd64'
           - os: macos-arm
+            # Uses a macOS arm image here
+            # https://github.com/actions/runner-images
             runner: macos-14
             os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 ${POSIX_CMAKE_ARGS} ${MACOS_CMAKE_ARGS}'
             build-args: '-j$(sysctl -n hw.ncpu)'
