@@ -53,7 +53,7 @@ jobs:
           - clang-version: 19
             release: llvm-project-19.1.0.src
           - clang-version: 20
-            release: llvm-project-20.0.0.src
+            release: llvm-project-20.1.0.src
           #- os: linux
             #runner: ubuntu-20.04
             #os-cmake-args: '-DLLVM_BUILD_STATIC=ON -DCMAKE_CXX_FLAGS="-s -flto" ${POSIX_CMAKE_ARGS} ${LINUX_CMAKE_ARGS}'
