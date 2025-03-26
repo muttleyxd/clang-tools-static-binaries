@@ -185,16 +185,29 @@ jobs:
         path: "${{ matrix.release }}${{ matrix.bindir }}/clang-*-${{ env.suffix }}*"
         retention-days: 1
   draft-release:
-    strategy:
-      matrix:
-        os: [ linux, macosx, windows ]
     runs-on: ubuntu-20.04
     needs: build
     steps:
       - name: download artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: "clang*${{ matrix.os }}*"
+          pattern: "clang*linux*"
+      - name: list files
+        run: ls -laR .
+      - name: Workaround - delete all files over 2G, above github release file upload limit
+        run: find . -type f -size +2G -exec rm -v {} \;
+      - name: download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "clang*macosx*"
+      - name: list files
+        run: ls -laR .
+      - name: Workaround - delete all files over 2G, above github release file upload limit
+        run: find . -type f -size +2G -exec rm -v {} \;
+      - name: download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "clang*windows*"
       - name: list files
         run: ls -laR .
       - name: Workaround - delete all files over 2G, above github release file upload limit
