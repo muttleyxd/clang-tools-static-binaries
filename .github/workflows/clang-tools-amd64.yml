@@ -2,7 +2,7 @@ name: clang-tools-static-amd64
 
 on:
   push:
-    branches: [ master]
+    branches: [ master, smaller-artifacts ]
 
 jobs:
   build:
