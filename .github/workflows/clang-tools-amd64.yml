@@ -91,6 +91,9 @@ jobs:
             extra-tar-args-cfe: '--exclude=cfe-${version}.src/test/Driver/Inputs/*'
             arch: 'amd64'
         exclude:
+          # Clang 14 is not building on arm
+          - clang-version: 14
+            os: macos-arm
           # Clang 17 does not build on mac arm
           # See: https://github.com/llvm/llvm-project/pull/78704
           - clang-version: 17
