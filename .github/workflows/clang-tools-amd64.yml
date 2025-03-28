@@ -91,37 +91,6 @@ jobs:
             extra-tar-args-cfe: '--exclude=cfe-${version}.src/test/Driver/Inputs/*'
             arch: 'amd64'
         exclude:
-          # To prevent disk space issues at the draft-release step, omits old versions of clang on macos arm
-          - clang-version: 3.9
-            os: macos-arm
-          - clang-version: 4
-            os: macos-arm
-          - clang-version: 5
-            os: macos-arm
-          - clang-version: 6
-            os: macos-arm
-          - clang-version: 7
-            os: macos-arm
-          - clang-version: 8
-            os: macos-arm
-          - clang-version: 9
-            os: macos-arm
-          - clang-version: 10
-            os: macos-arm
-          - clang-version: 11
-            os: macos-arm
-          - clang-version: 12
-            os: macos-arm
-          - clang-version: 12.0.1
-            os: macos-arm
-          - clang-version: 13
-            os: macos-arm
-          - clang-version: 14
-            os: macos-arm
-          - clang-version: 15
-            os: macos-arm
-          - clang-version: 16
-            os: macos-arm
           # Clang 17 does not build on mac arm
           # See: https://github.com/llvm/llvm-project/pull/78704
           - clang-version: 17
@@ -130,7 +99,8 @@ jobs:
     env:
       COMMON_CMAKE_ARGS: '-DBUILD_SHARED_LIBS=OFF -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"'
       LINUX_CMAKE_ARGS: '-DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_C_COMPILER=gcc-10'
-      MACOS_CMAKE_ARGS: '-DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14'
+      # Additional macos flags reduce file sizes
+      MACOS_CMAKE_ARGS: '-DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14 -DLLVM_ENABLE_ASSERTIONS=OFF -DLLVM_LINK_LLVM_DYLIB=ON -DLLVM_BUILD_LLVM_DYLIB=ON'
       POSIX_CMAKE_ARGS: '-DCMAKE_BUILD_TYPE=MinSizeRel'
       RELEASE: '${{ matrix.release }}'
       suffix: '${{ matrix.clang-version }}_${{ matrix.os }}-${{ matrix.arch }}'
