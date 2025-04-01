@@ -91,6 +91,9 @@ jobs:
             extra-tar-args-cfe: '--exclude=cfe-${version}.src/test/Driver/Inputs/*'
             arch: 'amd64'
         exclude:
+          # Clang 9 is not building on arm
+          - clang-version: 9
+            os: macos-arm
           # Clang 14 is not building on arm
           - clang-version: 14
             os: macos-arm
