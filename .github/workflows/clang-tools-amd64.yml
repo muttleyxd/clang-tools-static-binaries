@@ -28,7 +28,7 @@ jobs:
             extra-cmake-args: "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
           - clang-version: 8
             release: llvm-project-8.0.1
-            extra-cmake-args: '-DCLANG_ANALYZER_ENABLE_Z3_SOLVER=OFF'
+            extra-cmake-args: '-DCLANG_ANALYZER_ENABLE_Z3_SOLVER=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5'
           - clang-version: 9
             release: llvm-project-9.0.1
             extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
