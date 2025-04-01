@@ -13,12 +13,16 @@ jobs:
         include:
           - clang-version: 3.9
             release: llvm-project-3.9.1
+            extra-cmake-args: "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
           - clang-version: 4
             release: llvm-project-4.0.1
+            extra-cmake-args: "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
           - clang-version: 5
             release: llvm-project-5.0.2
+            extra-cmake-args: "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
           - clang-version: 6
             release: llvm-project-6.0.1
+            extra-cmake-args: "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
           - clang-version: 7
             release: llvm-project-7.1.0
           - clang-version: 8
