@@ -158,6 +158,22 @@ jobs:
     - name: print dependencies
       if: ${{ matrix.os == 'macosx' }}
       run: otool -L ${{ matrix.release }}/build/bin/clang-format
+    - name: smoke test clang-tools (macos, linux)
+      if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
+      run: |
+        cd ${{ matrix.release }}/build/bin
+        ./clang-format --version
+        ./clang-query --version
+        ./clang-tidy --version
+        ./clang-apply-replacements --version
+    - name: smoke test clang-tools (windows)
+      if: ${{ matrix.os == 'windows' }}
+      run: |
+        cd ${{ matrix.release }}${{ matrix.bindir }}
+        clang-format${{ matrix.dotexe }} --version
+        clang-query${{ matrix.dotexe }} --version
+        clang-tidy${{ matrix.dotexe }} --version
+        clang-apply-replacements${{ matrix.dotexe }} --version
     - name: rename output binary
       run: |
         cd ${{ matrix.release }}${{ matrix.bindir }}
