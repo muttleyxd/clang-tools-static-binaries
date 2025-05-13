@@ -190,7 +190,7 @@ jobs:
         path: "${{ matrix.release }}${{ matrix.bindir }}/clang-*-${{ env.suffix }}*"
         retention-days: 1
   draft-release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: build
     steps:
       - name: download artifacts
