@@ -218,12 +218,14 @@ jobs:
             runner: windows-latest
     runs-on: ${{ matrix.runner }}
     needs: build
+    env:
+      suffix: '_${{ matrix.os }}-amd64'
     steps:
       - name: download artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-          pattern: '*${{ matrix.os }}*'
+          pattern: '*${{ matrix.suffix }}'
       - name: list files
         run: ls -laR artifacts/
       - name: smoke test each clang tool
