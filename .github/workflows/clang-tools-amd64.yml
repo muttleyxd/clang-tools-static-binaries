@@ -205,6 +205,36 @@ jobs:
         name: clang-tools-${{ matrix.release }}-${{ env.suffix }}
         path: "${{ matrix.release }}${{ matrix.bindir }}/clang-*-${{ env.suffix }}*"
         retention-days: 1
+  test-release:
+    strategy:
+      matrix:
+        os: [ linux, macosx, windows ]
+        include:
+          - os: linux
+            runner: ubuntu-22.04
+          - os: macosx
+            runner: macos-13
+          - os: windows
+            runner: windows-latest
+    runs-on: ${{ matrix.runner }}
+    needs: build
+    steps:
+      - name: download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: '*${{ matrix.os }}*'
+      - name: list files
+        run: ls -laR artifacts/
+      - name: smoke test each clang tool
+        run: |
+          cd artifacts
+          # From the artifacts directory, loop over each executable and 
+          # invoke the --version command
+          for tool in $(find . -type f); do
+            echo "Running $tool --version"
+            $tool --version
+          done
   draft-release:
     runs-on: ubuntu-22.04
     needs: build
