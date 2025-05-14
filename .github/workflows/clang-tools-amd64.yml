@@ -237,7 +237,7 @@ jobs:
           done
   draft-release:
     runs-on: ubuntu-22.04
-    needs: build
+    needs: [build, test-release]
     steps:
       - name: download artifacts
         uses: actions/download-artifact@v4
