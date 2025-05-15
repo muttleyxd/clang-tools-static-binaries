@@ -225,7 +225,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-          pattern: '*${{ matrix.suffix }}'
+          pattern: '*${{ env.suffix }}'
       - name: list files
         run: ls -laR artifacts/
       - name: smoke test each clang tool
