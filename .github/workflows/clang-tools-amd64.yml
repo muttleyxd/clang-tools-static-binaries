@@ -231,9 +231,16 @@ jobs:
       - name: smoke test each clang tool
         run: |
           cd artifacts
-          # From the artifacts directory, loop over each executable and 
-          # invoke the --version command
+          # From the artifacts directory, loop over each executable
+          # (not .sha512sum files) and 
+          # invoke the --version command to verify
+          
           for tool in $(find . -type f); do
+            # Skip the sha512sum files
+            if [[ $tool == *.sha512sum ]]; then
+              continue
+            fi
+            # Run the tool with --version and print the output
             echo "Running $tool --version"
             $tool --version
           done
