@@ -240,7 +240,6 @@ jobs:
             if [[ $tool == *.sha512sum ]]; then
               continue
             fi
-            chmod +x $tool
             # Run the tool with --version and print the output
             echo "Running $tool --version"
             $tool --version
