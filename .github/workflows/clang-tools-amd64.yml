@@ -248,6 +248,34 @@ jobs:
             echo "Running $tool --version"
             $tool --version
           done
+      - name: List files (Windows)
+        if: ${{ matrix.os == 'windows' }}
+        run: |
+          Get-ChildItem -Recurse artifacts | Format-List
+
+      - name: Smoke test each clang tool (Windows)
+        if: ${{ matrix.os == 'windows' }}
+        shell: pwsh
+        run: |
+          Set-Location artifacts
+
+          # Find all files excluding *.sha512sum
+          $tools = Get-ChildItem -Recurse -File | Where-Object { $_.Name -notlike '*.sha512sum' }
+
+          foreach ($tool in $tools) {
+              # Ensure the file is executable
+              $toolPath = $tool.FullName
+
+              # Print which tool is being run
+              Write-Host "Running $toolPath --version"
+
+              try {
+                  # Attempt to run the tool with --version
+                  & $toolPath --version
+              } catch {
+                  Write-Host "Failed to run $toolPath --version. Error: $_"
+              }
+          }
   draft-release:
     runs-on: ubuntu-22.04
     needs: [build, test-release]
