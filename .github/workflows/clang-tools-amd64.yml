@@ -10,7 +10,7 @@ jobs:
       matrix:
         #clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12.0.1, 13, 14, 15, 16, 17, 18, 19, 20 ]
         # test
-        clang-version: [ 19 ]
+        clang-version: [ 18, 19 ]
         os: [ linux, macosx, windows ]
         include:
           - clang-version: 3.9
@@ -81,7 +81,6 @@ jobs:
           # TODO: macosx clang 18 is failing.  Example: https://github.com/colinsullivan/clang-tools-static-binaries/actions/runs/14976168180/job/42068957048
           - os: macosx
             clang-version: 18
-
     runs-on: ${{ matrix.runner }}
     env:
       COMMON_CMAKE_ARGS: '-DBUILD_SHARED_LIBS=OFF -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"'
