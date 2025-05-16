@@ -226,7 +226,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-          pattern: '*${{ env.suffix }}'
+          pattern: '**/*${{ env.suffix }}'
       - name: list files (macos, linux)
         if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
         run: ls -laR artifacts/
