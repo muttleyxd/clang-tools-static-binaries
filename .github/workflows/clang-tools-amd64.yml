@@ -228,9 +228,11 @@ jobs:
         with:
           path: artifacts
           pattern: '*${{ env.suffix }}'
-      - name: list files
+      - name: list files (macos, linux)
+        if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
         run: ls -laR artifacts/
-      - name: smoke test each clang tool
+      - name: smoke test each clang tool (macos, linux)
+        if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
         run: |
           cd artifacts
           # From the artifacts directory, loop over each executable
