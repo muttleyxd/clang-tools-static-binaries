@@ -13,49 +13,37 @@ jobs:
         include:
           - clang-version: 3.9
             release: llvm-project-3.9.1
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=14'
           - clang-version: 4
             release: llvm-project-4.0.1
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=14'
           - clang-version: 5
             release: llvm-project-5.0.2
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=14'
           - clang-version: 6
             release: llvm-project-6.0.1
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=14'
           - clang-version: 7
             release: llvm-project-7.1.0
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=14'
           - clang-version: 8
             release: llvm-project-8.0.1
-            extra-cmake-args: '-DCLANG_ANALYZER_ENABLE_Z3_SOLVER=OFF -DCMAKE_CXX_STANDARD=14'
+            extra-cmake-args: '-DCLANG_ANALYZER_ENABLE_Z3_SOLVER=OFF'
           - clang-version: 9
             release: llvm-project-9.0.1
-            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF -DCMAKE_CXX_STANDARD=14'
+            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
           - clang-version: 10
             release: llvm-project-10.0.1
-            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF -DCMAKE_CXX_STANDARD=17'
+            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
           - clang-version: 11
             release: llvm-project-11.1.0.src
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=17'
           - clang-version: 12
             release: llvm-project-12.0.0.src
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=17'
           - clang-version: 12.0.1
             release: llvm-project-12.0.1.src
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=17'
           - clang-version: 13
             release: llvm-project-13.0.0.src
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=17'
           - clang-version: 14
             release: llvm-project-14.0.0.src
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=17'
           - clang-version: 15
             release: llvm-project-15.0.2.src
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=17'
           - clang-version: 16
             release: llvm-project-16.0.3.src
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=17'
           - clang-version: 17
             release: llvm-project-17.0.4.src
             extra-cmake-args: '-DCMAKE_CXX_STANDARD=17'
