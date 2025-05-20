@@ -85,13 +85,6 @@ jobs:
       RELEASE: '${{ matrix.release }}'
       suffix: '${{ matrix.clang-version }}_${{ matrix.os }}-amd64'
     steps:
-    - name: Update homebrew
-      if: ${{ matrix.os == 'macosx' && matrix.clang-version >= '17' }}
-      shell: bash
-      run: |
-        brew update
-        brew upgrade
-        brew cleanup
     - name: download patches
       # we download a tarball of this repo, as the presence of a .git directory leaks
       # the commit hash of this repository into the clang binaries
