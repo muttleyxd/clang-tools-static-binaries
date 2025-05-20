@@ -46,16 +46,16 @@ jobs:
             release: llvm-project-16.0.3.src
           - clang-version: 17
             release: llvm-project-17.0.4.src
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=17'
+            extra-cmake-args: '-DCMAKE_CXX_STANDARD=20'
           - clang-version: 18
             release: llvm-project-18.1.8.src
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=17'
+            extra-cmake-args: '-DCMAKE_CXX_STANDARD=20'
           - clang-version: 19
             release: llvm-project-19.1.0.src
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=17'
+            extra-cmake-args: '-DCMAKE_CXX_STANDARD=20'
           - clang-version: 20
             release: llvm-project-20.1.0.src
-            extra-cmake-args: '-DCMAKE_CXX_STANDARD=17'
+            extra-cmake-args: '-DCMAKE_CXX_STANDARD=20'
           - os: linux
             runner: ubuntu-22.04
             os-cmake-args: '-DLLVM_BUILD_STATIC=ON -DCMAKE_CXX_FLAGS="-s -flto" ${POSIX_CMAKE_ARGS} ${LINUX_CMAKE_ARGS}'
