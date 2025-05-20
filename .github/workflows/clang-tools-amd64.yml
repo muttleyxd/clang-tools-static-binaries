@@ -86,7 +86,7 @@ jobs:
       suffix: '${{ matrix.clang-version }}_${{ matrix.os }}-amd64'
     steps:
     - name: Update homebrew
-      if: ${{ matrix.os == 'macosx' && matrix.clang-version >= '18' }}
+      if: ${{ matrix.os == 'macosx' && matrix.clang-version >= '17' }}
       shell: bash
       run: |
         brew update
