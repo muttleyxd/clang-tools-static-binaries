@@ -99,6 +99,7 @@ jobs:
             os: macos-arm
           # Clang 17 does not build on mac arm
           # See: https://github.com/llvm/llvm-project/pull/78704
+          # https://github.com/llvm/llvm-project/issues/106521
           - clang-version: 17
             os: macos-arm
     runs-on: ${{ matrix.runner }}
