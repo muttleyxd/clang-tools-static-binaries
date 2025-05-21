@@ -238,18 +238,24 @@ jobs:
   test-release:
     strategy:
       matrix:
-        os: [ linux, macosx, windows ]
+        os: [ linux, macosx, windows, macos-arm ]
         include:
           - os: linux
             runner: ubuntu-22.04
+            arch: 'amd64'
           - os: macosx
             runner: macos-13 # Intel macOS runner test
+            arch: 'amd64'
           - os: windows
             runner: windows-latest
+            arch: 'amd64'
+          - os: macos-arm
+            runner: macos-14 # Apple silicon macOS runner test
+            arch: 'arm64'
     runs-on: ${{ matrix.runner }}
     needs: build
     env:
-      suffix: '_${{ matrix.os }}-amd64'
+      suffix: '_${{ matrix.os }}-${{ matrix.arch }}'
     steps:
       - name: download artifacts
         uses: actions/download-artifact@v4
@@ -257,10 +263,10 @@ jobs:
           path: artifacts
           pattern: '**/*${{ env.suffix }}'
       - name: list files (macos, linux)
-        if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
+        if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' || matrix.os == 'macos-arm' }}
         run: ls -laR artifacts/
       - name: smoke test each clang tool (macos, linux)
-        if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
+        if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' || matrix.os == 'macos-arm' }}
         run: |
           cd artifacts
           # From the artifacts directory, loop over each executable
