@@ -53,7 +53,7 @@ jobs:
           - clang-version: 20
             release: llvm-project-20.1.0.src
           - os: linux
-            runner: ubuntu-20.04
+            runner: ubuntu-22.04
             os-cmake-args: '-DLLVM_BUILD_STATIC=ON -DCMAKE_CXX_FLAGS="-s -flto" ${POSIX_CMAKE_ARGS} ${LINUX_CMAKE_ARGS}'
             build-args: '-j$(nproc)'
             bindir: '/build/bin'
@@ -61,7 +61,7 @@ jobs:
             shacmd: 'sha512sum'
           - os: macosx
             runner: macos-13
-            os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 ${POSIX_CMAKE_ARGS} ${MACOS_CMAKE_ARGS}'
+            os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 ${POSIX_CMAKE_ARGS} ${MACOS_CMAKE_ARGS} -DLLVM_TARGETS_TO_BUILD=X86'
             build-args: '-j$(sysctl -n hw.ncpu)'
             bindir: '/build/bin'
             dotexe: ''
@@ -147,10 +147,18 @@ jobs:
       if: ${{ ( matrix.clang-version == 9 || matrix.clang-version == 10 ) && matrix.os == 'windows' }}
       shell: bash
       run: patch ${{ matrix.release }}/llvm/cmake/config-ix.cmake windows-clang-9-10-trivially-copyable-mismatch.patch
-    - name: patch cmake implicit link libraries on macosx
+    - name: Patch cmake implicit link libraries on macosx
       if: ${{ matrix.os == 'macosx' }}
       shell: bash
-      run: sed -i.backup 's/gcc_eh.\*|/gcc_eh.*|gcc_ext.*|/g' $(find /usr/local/Cellar -name CMakeParseImplicitLinkInfo.cmake)
+      run: |
+        BREW_PREFIX=$(brew --prefix)
+        FILES=$(find "$BREW_PREFIX" -name CMakeParseImplicitLinkInfo.cmake)
+        
+        for file in $FILES; do
+          echo "Patching $file"
+          sed -i.backup 's/gcc_eh.*|/gcc_eh.*|gcc_ext.*|/g' "$file"
+        done
+
     - name: cmake
       run: cmake -S ${{ matrix.release }}/llvm -B ${{ matrix.release }}/build ${{ env.COMMON_CMAKE_ARGS }} ${{ matrix.os-cmake-args }} ${{ matrix.extra-cmake-args }}
     - name: build
@@ -158,6 +166,22 @@ jobs:
     - name: print dependencies
       if: ${{ matrix.os == 'macosx' }}
       run: otool -L ${{ matrix.release }}/build/bin/clang-format
+    - name: smoke test clang-tools (macos, linux)
+      if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
+      run: |
+        cd ${{ matrix.release }}/build/bin
+        ./clang-format --version
+        ./clang-query --version
+        ./clang-tidy --version
+        ./clang-apply-replacements --version
+    - name: smoke test clang-tools (windows)
+      if: ${{ matrix.os == 'windows' }}
+      run: |
+        cd ${{ matrix.release }}${{ matrix.bindir }}
+        clang-format${{ matrix.dotexe }} --version
+        clang-query${{ matrix.dotexe }} --version
+        clang-tidy${{ matrix.dotexe }} --version
+        clang-apply-replacements${{ matrix.dotexe }} --version
     - name: rename output binary
       run: |
         cd ${{ matrix.release }}${{ matrix.bindir }}
@@ -184,9 +208,79 @@ jobs:
         name: clang-tools-${{ matrix.release }}-${{ env.suffix }}
         path: "${{ matrix.release }}${{ matrix.bindir }}/clang-*-${{ env.suffix }}*"
         retention-days: 1
-  draft-release:
-    runs-on: ubuntu-20.04
+  test-release:
+    strategy:
+      matrix:
+        os: [ linux, macosx, windows ]
+        include:
+          - os: linux
+            runner: ubuntu-22.04
+          - os: macosx
+            runner: macos-13 # Intel macOS runner test
+          - os: windows
+            runner: windows-latest
+    runs-on: ${{ matrix.runner }}
     needs: build
+    env:
+      suffix: '_${{ matrix.os }}-amd64'
+    steps:
+      - name: download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: '**/*${{ env.suffix }}'
+      - name: list files (macos, linux)
+        if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
+        run: ls -laR artifacts/
+      - name: smoke test each clang tool (macos, linux)
+        if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
+        run: |
+          cd artifacts
+          # From the artifacts directory, loop over each executable
+          # (not .sha512sum files) and 
+          # invoke the --version command to verify
+          
+          for tool in $(find . -type f); do
+            # Skip the sha512sum files
+            if [[ $tool == *.sha512sum ]]; then
+              continue
+            fi
+            chmod +x $tool
+            # Run the tool with --version and print the output
+            echo "Running $tool --version"
+            $tool --version
+          done
+      - name: List files (Windows)
+        if: ${{ matrix.os == 'windows' }}
+        run: |
+          Get-ChildItem -Recurse artifacts | Format-List
+
+      - name: Smoke test each clang tool (Windows)
+        if: ${{ matrix.os == 'windows' }}
+        shell: pwsh
+        run: |
+          Set-Location artifacts
+
+          # Find all files excluding *.sha512sum
+          $tools = Get-ChildItem -Recurse -File | Where-Object { $_.Name -notlike '*.sha512sum' }
+
+          foreach ($tool in $tools) {
+              # Ensure the file is executable
+              $toolPath = $tool.FullName
+
+              # Print which tool is being run
+              Write-Host "Running $toolPath --version"
+
+              try {
+                  # Attempt to run the tool with --version
+                  & $toolPath --version
+              } catch {
+                  Write-Host "Failed to run $toolPath --version. Error: $_"
+              }
+          }
+  draft-release:
+    runs-on: ubuntu-22.04
+    needs: [build, test-release]
     steps:
       - name: download artifacts
         uses: actions/download-artifact@v4
