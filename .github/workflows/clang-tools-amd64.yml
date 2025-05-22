@@ -102,6 +102,12 @@ jobs:
           # https://github.com/llvm/llvm-project/issues/106521
           - clang-version: 17
             os: macos-arm
+          # 20 builds but is not portable on mac arm
+          # clang-tidy fails with
+          #   `Library not loaded: /usr/lib/libz.1.dylib`
+          #   tried: '/usr/lib/libz.1.dylib' (no such file)
+          - clang-version: 20
+            os: macos-arm
     runs-on: ${{ matrix.runner }}
     env:
       COMMON_CMAKE_ARGS: '-DBUILD_SHARED_LIBS=OFF -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"'
