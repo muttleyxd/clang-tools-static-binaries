@@ -2,7 +2,7 @@ name: clang-tools-static-amd64
 
 on:
   push:
-    branches: [ master]
+    branches: [ master, cmake-upgrade-fix ]
 
 jobs:
   build:
@@ -53,7 +53,7 @@ jobs:
           - clang-version: 20
             release: llvm-project-20.1.0.src
           - os: linux
-            runner: ubuntu-20.04
+            runner: ubuntu-22.04
             os-cmake-args: '-DLLVM_BUILD_STATIC=ON -DCMAKE_CXX_FLAGS="-s -flto" ${POSIX_CMAKE_ARGS} ${LINUX_CMAKE_ARGS}'
             build-args: '-j$(nproc)'
             bindir: '/build/bin'
@@ -75,6 +75,11 @@ jobs:
             shacmd: 'sha512sum.exe'
             extra-tar-args: '--exclude=${RELEASE}/clang/test/Driver/Inputs/* --exclude=${RELEASE}/libcxx/test/std/input.output/filesystems/Inputs/static_test_env/* --exclude=${RELEASE}/libclc/amdgcn-mesa3d'
             extra-tar-args-cfe: '--exclude=cfe-${version}.src/test/Driver/Inputs/*'
+        exclude:
+          # TODO: macosx clang 18 is failing.  Example: https://github.com/colinsullivan/clang-tools-static-binaries/actions/runs/14976168180/job/42068957048
+          - os: macosx
+            clang-version: 18
+
     runs-on: ${{ matrix.runner }}
     env:
       COMMON_CMAKE_ARGS: '-DBUILD_SHARED_LIBS=OFF -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"'
@@ -185,7 +190,7 @@ jobs:
         path: "${{ matrix.release }}${{ matrix.bindir }}/clang-*-${{ env.suffix }}*"
         retention-days: 1
   draft-release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: build
     steps:
       - name: download artifacts
