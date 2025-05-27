@@ -2,7 +2,7 @@ name: clang-tools-static-amd64
 
 on:
   push:
-    branches: [ master, macos-arm-with-test ]
+    branches: [ master, macos-arm ]
 
 jobs:
   build:
@@ -64,7 +64,7 @@ jobs:
             # Uses a macOS amd image here
             # https://github.com/actions/runner-images
             runner: macos-13
-            os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 ${POSIX_CMAKE_ARGS} ${MACOS_CMAKE_ARGS} -DLLVM_TARGETS_TO_BUILD=X86'
+            os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto -ffunction-sections -fdata-sections" -DCMAKE_EXE_LINKER_FLAGS="-Wl,-dead_strip" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 ${POSIX_CMAKE_ARGS} ${MACOS_CMAKE_ARGS} -DLLVM_TARGETS_TO_BUILD=X86'
             build-args: '-j$(sysctl -n hw.ncpu)'
             bindir: '/build/bin'
             dotexe: ''
