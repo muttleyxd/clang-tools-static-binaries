@@ -199,10 +199,10 @@ jobs:
     - name: build
       run: cmake --build ${{ matrix.release }}/build ${{ matrix.build-args }} --target clang-format clang-query clang-tidy clang-apply-replacements
     - name: print dependencies
-      if: ${{ matrix.os == 'macosx' }}
+      if: ${{ matrix.os == 'macosx' || matrix.os == 'macos-arm' }}
       run: otool -L ${{ matrix.release }}/build/bin/clang-format
     - name: smoke test clang-tools (macos, linux)
-      if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
+      if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' || matrix.os == 'macos-arm' }}
       run: |
         cd ${{ matrix.release }}/build/bin
         ./clang-format --version
