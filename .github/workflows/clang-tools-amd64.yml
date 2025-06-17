@@ -2,7 +2,7 @@ name: clang-tools-static-amd64
 
 on:
   push:
-    branches: [ master, macos-arm-squash ]
+    branches: [ master, separate-artifact-uploads ]
 
 jobs:
   build:
