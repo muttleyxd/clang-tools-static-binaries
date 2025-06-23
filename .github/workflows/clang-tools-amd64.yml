@@ -2,10 +2,17 @@ name: clang-tools-static-amd64
 
 on:
   push:
-    branches: [ master, macos-smaller-binaries-2 ]
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
+    concurrency:
+      group: >-
+        ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}-${{
+        matrix.clang-version }}-${{ matrix.os }}-${{ matrix.runner }}
+      cancel-in-progress: true
     strategy:
       matrix:
         clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12.0.1, 13, 14, 15, 16, 17, 18, 19, 20 ]
@@ -209,6 +216,11 @@ jobs:
         path: "${{ matrix.release }}${{ matrix.bindir }}/clang-*-${{ env.suffix }}*"
         retention-days: 1
   test-release:
+    concurrency:
+      group: >-
+        ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}-${{
+        '' }}-${{ matrix.os }}-${{ matrix.runner }}
+      cancel-in-progress: true
     strategy:
       matrix:
         os: [ linux, macosx, windows ]
@@ -280,6 +292,7 @@ jobs:
           }
   draft-release:
     runs-on: ubuntu-22.04
+    if: ${{ github.ref == 'ref/head/master' }}
     needs: [build, test-release]
     steps:
       - name: download artifacts
