@@ -332,8 +332,7 @@ jobs:
       - name: draft release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        #uses: svenstaro/upload-release-action@v2
-        uses: colinsullivan/upload-release-action@b469d601c2a9d6838eb3e67e5596399e379a8b9c
+        uses: svenstaro/upload-release-action@v2.10.0
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           draft: true
