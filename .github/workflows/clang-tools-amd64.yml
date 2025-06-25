@@ -2,7 +2,7 @@ name: clang-tools-static-amd64
 
 on:
   push:
-    branches: [ master, macos-arm-squash ]
+    branches: [ master, macos-arm-20 ]
 
 jobs:
   build:
@@ -107,8 +107,6 @@ jobs:
           #   `Library not loaded: /usr/lib/libz.1.dylib`
           #   tried: '/usr/lib/libz.1.dylib' (no such file)
           - clang-version: 19
-            os: macos-arm
-          - clang-version: 20
             os: macos-arm
     runs-on: ${{ matrix.runner }}
     env:
