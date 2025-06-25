@@ -2,7 +2,7 @@ name: clang-tools-static-amd64
 
 on:
   push:
-    branches: [ master, macos-arm-squash ]
+    branches: [ master, separate-artifact-uploads ]
 
 jobs:
   build:
@@ -332,9 +332,10 @@ jobs:
       - name: draft release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: svenstaro/upload-release-action@v2
+        uses: svenstaro/upload-release-action@2.10.0
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           draft: true
           file_glob: true
           file: clang-*/**/*
+          check_duplicates: false
