@@ -45,7 +45,7 @@ jobs:
           - clang-version: 16
             release: llvm-project-16.0.3.src
           - clang-version: 17
-            release: llvm-project-17.0.4.src
+            release: llhttps://github.com/llvm/llvm-project/pull/78704vm-project-17.0.4.src
           - clang-version: 18
             release: llvm-project-18.1.8.src
           - clang-version: 19
@@ -107,8 +107,6 @@ jobs:
           #   `Library not loaded: /usr/lib/libz.1.dylib`
           #   tried: '/usr/lib/libz.1.dylib' (no such file)
           - clang-version: 19
-            os: macos-arm
-          - clang-version: 20
             os: macos-arm
     runs-on: ${{ matrix.runner }}
     env:
