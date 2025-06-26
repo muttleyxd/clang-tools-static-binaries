@@ -94,9 +94,6 @@ jobs:
           # Clang 9 is not building on arm
           - clang-version: 9
             os: macos-arm
-          # Clang 14 is not building on arm
-          - clang-version: 14
-            os: macos-arm
           # Clang 17 does not build on mac arm
           # See: https://github.com/llvm/llvm-project/pull/78704
           # https://github.com/llvm/llvm-project/issues/106521
