@@ -10,7 +10,8 @@ jobs:
       matrix:
         #clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12.0.1, 13, 14, 15, 16, 17, 18, 19, 20 ]
         clang-version: [ 20 ]
-        os: [ linux, macosx, macos-arm, windows ]
+        #os: [ linux, macosx, macos-arm, windows ]
+        os: [ macos-arm ]
         include:
           #- clang-version: 3.9
             #release: llvm-project-3.9.1
@@ -53,24 +54,24 @@ jobs:
             #release: llvm-project-19.1.0.src
           - clang-version: 20
             release: llvm-project-20.1.0.src
-          - os: linux
-            runner: ubuntu-22.04
-            os-cmake-args: '-DLLVM_BUILD_STATIC=ON -DCMAKE_CXX_FLAGS="-s -flto" ${POSIX_CMAKE_ARGS} ${LINUX_CMAKE_ARGS}'
-            build-args: '-j$(nproc)'
-            bindir: '/build/bin'
-            dotexe: ''
-            shacmd: 'sha512sum'
-            arch: 'amd64'
-          - os: macosx
-            # Uses a macOS amd image here
-            # https://github.com/actions/runner-images
-            runner: macos-13
-            os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto -ffunction-sections -fdata-sections" -DCMAKE_EXE_LINKER_FLAGS="-Wl,-dead_strip" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 ${POSIX_CMAKE_ARGS} ${MACOS_CMAKE_ARGS} -DLLVM_TARGETS_TO_BUILD=X86'
-            build-args: '-j$(sysctl -n hw.ncpu)'
-            bindir: '/build/bin'
-            dotexe: ''
-            shacmd: 'shasum -a512'
-            arch: 'amd64'
+          #- os: linux
+            #runner: ubuntu-22.04
+            #os-cmake-args: '-DLLVM_BUILD_STATIC=ON -DCMAKE_CXX_FLAGS="-s -flto" ${POSIX_CMAKE_ARGS} ${LINUX_CMAKE_ARGS}'
+            #build-args: '-j$(nproc)'
+            #bindir: '/build/bin'
+            #dotexe: ''
+            #shacmd: 'sha512sum'
+            #arch: 'amd64'
+          #- os: macosx
+            ## Uses a macOS amd image here
+            ## https://github.com/actions/runner-images
+            #runner: macos-13
+            #os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto -ffunction-sections -fdata-sections" -DCMAKE_EXE_LINKER_FLAGS="-Wl,-dead_strip" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 ${POSIX_CMAKE_ARGS} ${MACOS_CMAKE_ARGS} -DLLVM_TARGETS_TO_BUILD=X86'
+            #build-args: '-j$(sysctl -n hw.ncpu)'
+            #bindir: '/build/bin'
+            #dotexe: ''
+            #shacmd: 'shasum -a512'
+            #arch: 'amd64'
           - os: macos-arm
             # Uses a macOS arm image here
             # https://github.com/actions/runner-images
@@ -81,34 +82,28 @@ jobs:
             dotexe: ''
             shacmd: 'shasum -a512'
             arch: 'arm64'
-          - os: windows
-            runner: windows-latest
-            os-cmake-args: '-Thost=x64 -DCMAKE_CXX_FLAGS="/MP /std:c++14" -DLLVM_USE_CRT_MINSIZEREL="MT"'
-            build-args: '--config MinSizeRel'
-            bindir: '/build/MinSizeRel/bin'
-            dotexe: '.exe'
-            shacmd: 'sha512sum.exe'
-            extra-tar-args: '--exclude=${RELEASE}/clang/test/Driver/Inputs/* --exclude=${RELEASE}/libcxx/test/std/input.output/filesystems/Inputs/static_test_env/* --exclude=${RELEASE}/libclc/amdgcn-mesa3d'
-            extra-tar-args-cfe: '--exclude=cfe-${version}.src/test/Driver/Inputs/*'
-            arch: 'amd64'
-        #exclude:
-          ## Clang 9 is not building on arm
-          #- clang-version: 9
-            #os: macos-arm
-          ## Clang 14 is not building on arm
-          #- clang-version: 14
-            #os: macos-arm
-          ## Clang 17 does not build on mac arm
-          ## See: https://github.com/llvm/llvm-project/pull/78704
-          ## https://github.com/llvm/llvm-project/issues/106521
-          #- clang-version: 17
-            #os: macos-arm
-          ## 19, 20 builds but is not portable on mac arm
-          ## clang-tidy fails with
-          ##   `Library not loaded: /usr/lib/libz.1.dylib`
-          ##   tried: '/usr/lib/libz.1.dylib' (no such file)
-          #- clang-version: 19
-            #os: macos-arm
+          #- os: windows
+            #runner: windows-latest
+            #os-cmake-args: '-Thost=x64 -DCMAKE_CXX_FLAGS="/MP /std:c++14" -DLLVM_USE_CRT_MINSIZEREL="MT"'
+            #build-args: '--config MinSizeRel'
+            #bindir: '/build/MinSizeRel/bin'
+            #dotexe: '.exe'
+            #shacmd: 'sha512sum.exe'
+            #extra-tar-args: '--exclude=${RELEASE}/clang/test/Driver/Inputs/* --exclude=${RELEASE}/libcxx/test/std/input.output/filesystems/Inputs/static_test_env/* --exclude=${RELEASE}/libclc/amdgcn-mesa3d'
+            #extra-tar-args-cfe: '--exclude=cfe-${version}.src/test/Driver/Inputs/*'
+            #arch: 'amd64'
+        exclude:
+          # Clang 17 does not build on mac arm
+          # See: https://github.com/llvm/llvm-project/pull/78704
+          # https://github.com/llvm/llvm-project/issues/106521
+          - clang-version: 17
+            os: macos-arm
+          # 19, 20 builds but is not portable on mac arm
+          # clang-tidy fails with
+          #   `Library not loaded: /usr/lib/libz.1.dylib`
+          #   tried: '/usr/lib/libz.1.dylib' (no such file)
+          - clang-version: 19
+            os: macos-arm
     runs-on: ${{ matrix.runner }}
     env:
       COMMON_CMAKE_ARGS: '-DBUILD_SHARED_LIBS=OFF -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"'
