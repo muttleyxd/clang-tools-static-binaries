@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12.0.1, 13, 14, 15, 16, 17, 18, 19, 20 ]
-        os: [ linux, macosx, windows ]
+        os: [ linux, macosx, macos-arm, windows ]
         include:
           - clang-version: 3.9
             release: llvm-project-3.9.1
@@ -66,13 +66,27 @@ jobs:
             bindir: '/build/bin'
             dotexe: ''
             shacmd: 'sha512sum'
+            arch: 'amd64'
           - os: macosx
+            # Uses a macOS amd image here
+            # https://github.com/actions/runner-images
             runner: macos-13
             os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto -ffunction-sections -fdata-sections" -DCMAKE_EXE_LINKER_FLAGS="-Wl,-dead_strip" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 ${POSIX_CMAKE_ARGS} ${MACOS_CMAKE_ARGS} -DLLVM_TARGETS_TO_BUILD=X86'
             build-args: '-j$(sysctl -n hw.ncpu)'
             bindir: '/build/bin'
             dotexe: ''
             shacmd: 'shasum -a512'
+            arch: 'amd64'
+          - os: macos-arm
+            # Uses a macOS arm image here
+            # https://github.com/actions/runner-images
+            runner: macos-14
+            os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 ${POSIX_CMAKE_ARGS} ${MACOS_CMAKE_ARGS} -DLLVM_TARGETS_TO_BUILD=AArch64'
+            build-args: '-j$(sysctl -n hw.ncpu)'
+            bindir: '/build/bin'
+            dotexe: ''
+            shacmd: 'shasum -a512'
+            arch: 'arm64'
           - os: windows
             runner: windows-latest
             os-cmake-args: '-Thost=x64 -DCMAKE_CXX_FLAGS="/MP /std:c++14" -DLLVM_USE_CRT_MINSIZEREL="MT"'
@@ -82,6 +96,21 @@ jobs:
             shacmd: 'sha512sum.exe'
             extra-tar-args: '--exclude=${RELEASE}/clang/test/Driver/Inputs/* --exclude=${RELEASE}/libcxx/test/std/input.output/filesystems/Inputs/static_test_env/* --exclude=${RELEASE}/libclc/amdgcn-mesa3d'
             extra-tar-args-cfe: '--exclude=cfe-${version}.src/test/Driver/Inputs/*'
+            arch: 'amd64'
+        exclude:
+          # Clang 17 does not build on mac arm
+          # See: https://github.com/llvm/llvm-project/pull/78704
+          # https://github.com/llvm/llvm-project/issues/106521
+          - clang-version: 17
+            os: macos-arm
+          # 19, 20 builds but is not portable on mac arm
+          # clang-tidy fails with
+          #   `Library not loaded: /usr/lib/libz.1.dylib`
+          #   tried: '/usr/lib/libz.1.dylib' (no such file)
+          - clang-version: 19
+            os: macos-arm
+          - clang-version: 20
+            os: macos-arm
     runs-on: ${{ matrix.runner }}
     env:
       COMMON_CMAKE_ARGS: '-DBUILD_SHARED_LIBS=OFF -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"'
@@ -89,7 +118,7 @@ jobs:
       MACOS_CMAKE_ARGS: '-DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14'
       POSIX_CMAKE_ARGS: '-DCMAKE_BUILD_TYPE=MinSizeRel'
       RELEASE: '${{ matrix.release }}'
-      suffix: '${{ matrix.clang-version }}_${{ matrix.os }}-amd64'
+      suffix: '${{ matrix.clang-version }}_${{ matrix.os }}-${{ matrix.arch }}'
     steps:
     - name: download patches
       # we download a tarball of this repo, as the presence of a .git directory leaks
@@ -171,10 +200,10 @@ jobs:
     - name: build
       run: cmake --build ${{ matrix.release }}/build ${{ matrix.build-args }} --target clang-format clang-query clang-tidy clang-apply-replacements
     - name: print dependencies
-      if: ${{ matrix.os == 'macosx' }}
+      if: ${{ matrix.os == 'macosx' || matrix.os == 'macos-arm' }}
       run: otool -L ${{ matrix.release }}/build/bin/clang-format
     - name: smoke test clang-tools (macos, linux)
-      if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
+      if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' || matrix.os == 'macos-arm' }}
       run: |
         cd ${{ matrix.release }}/build/bin
         ./clang-format --version
@@ -223,18 +252,24 @@ jobs:
       cancel-in-progress: true
     strategy:
       matrix:
-        os: [ linux, macosx, windows ]
+        os: [ linux, macosx, windows, macos-arm ]
         include:
           - os: linux
             runner: ubuntu-22.04
+            arch: 'amd64'
           - os: macosx
             runner: macos-13 # Intel macOS runner test
+            arch: 'amd64'
           - os: windows
             runner: windows-latest
+            arch: 'amd64'
+          - os: macos-arm
+            runner: macos-14 # Apple silicon macOS runner test
+            arch: 'arm64'
     runs-on: ${{ matrix.runner }}
     needs: build
     env:
-      suffix: '_${{ matrix.os }}-amd64'
+      suffix: '_${{ matrix.os }}-${{ matrix.arch }}'
     steps:
       - name: download artifacts
         uses: actions/download-artifact@v4
@@ -242,10 +277,10 @@ jobs:
           path: artifacts
           pattern: '**/*${{ env.suffix }}'
       - name: list files (macos, linux)
-        if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
+        if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' || matrix.os == 'macos-arm' }}
         run: ls -laR artifacts/
       - name: smoke test each clang tool (macos, linux)
-        if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' }}
+        if: ${{ matrix.os == 'macosx' || matrix.os == 'linux' || matrix.os == 'macos-arm' }}
         run: |
           cd artifacts
           # From the artifacts directory, loop over each executable
@@ -304,9 +339,10 @@ jobs:
       - name: draft release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: svenstaro/upload-release-action@v2
+        uses: svenstaro/upload-release-action@2.10.0
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           draft: true
           file_glob: true
           file: clang-*/**/*
+          check_duplicates: false
