@@ -76,7 +76,7 @@ jobs:
             # Uses a macOS arm image here
             # https://github.com/actions/runner-images
             runner: macos-14
-            os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto" ${POSIX_CMAKE_ARGS} ${MACOS_CMAKE_ARGS} -DLLVM_TARGETS_TO_BUILD=AArch64'
+            os-cmake-args: '-DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++ -flto -ffunction-sections -fdata-sections" -DCMAKE_EXE_LINKER_FLAGS="-Wl,-dead_strip" ${POSIX_CMAKE_ARGS} ${MACOS_CMAKE_ARGS} -DLLVM_TARGETS_TO_BUILD=AArch64'
             build-args: '-j$(sysctl -n hw.ncpu)'
             bindir: '/build/bin'
             dotexe: ''
@@ -175,7 +175,7 @@ jobs:
       shell: bash
       run: patch ${{ matrix.release }}/llvm/cmake/config-ix.cmake windows-clang-9-10-trivially-copyable-mismatch.patch
     - name: Patch cmake implicit link libraries on macosx
-      if: ${{ matrix.os == 'macosx' }}
+      if: ${{ matrix.os == 'macosx' || matrix.os == 'macos-arm' }}
       shell: bash
       run: |
         BREW_PREFIX=$(brew --prefix)
