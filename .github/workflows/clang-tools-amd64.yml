@@ -107,6 +107,10 @@ jobs:
       RELEASE: '${{ matrix.release }}'
       suffix: '${{ matrix.clang-version }}_${{ matrix.os }}-${{ matrix.arch }}'
     steps:
+    - name: print system info on macos and linux
+      run: |
+        uname -a || systeminfo
+      if: ${{ matrix.os != 'windows' }}
     - name: download patches
       # we download a tarball of this repo, as the presence of a .git directory leaks
       # the commit hash of this repository into the clang binaries
