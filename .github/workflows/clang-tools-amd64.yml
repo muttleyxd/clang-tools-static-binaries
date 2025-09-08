@@ -323,7 +323,7 @@ jobs:
           }
   draft-release:
     runs-on: ubuntu-22.04
-    if: ${{ github.ref == 'ref/head/master' }}
+    if: ${{ github.ref == 'refs/heads/master' }}
     needs: [build, test-release]
     steps:
       - name: download artifacts
