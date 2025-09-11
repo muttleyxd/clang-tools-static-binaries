@@ -332,12 +332,16 @@ jobs:
         run: ls -laR .
       - name: Workaround - delete all files over 2G, above github release file upload limit
         run: find . -type f -size +2G -exec rm -v {} \;
+      - name: Get short SHA
+        id: sha
+        run: echo "short=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
       - name: draft release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: svenstaro/upload-release-action@2.10.0
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}-${{ steps.sha.outputs.short }}
           draft: true
           file_glob: true
           file: clang-*/**/*
