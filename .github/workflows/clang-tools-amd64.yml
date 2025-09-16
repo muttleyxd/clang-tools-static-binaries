@@ -20,28 +20,23 @@ jobs:
         include:
           - clang-version: 3.9
             release: llvm-project-3.9.1
-            extra-cmake-args: '-DCMAKE_POLICY_VERSION_MINIMUM=3.5'
           - clang-version: 4
             release: llvm-project-4.0.1
-            extra-cmake-args: '-DCMAKE_POLICY_VERSION_MINIMUM=3.5'
           - clang-version: 5
             release: llvm-project-5.0.2
-            extra-cmake-args: '-DCMAKE_POLICY_VERSION_MINIMUM=3.5'
           - clang-version: 6
             release: llvm-project-6.0.1
-            extra-cmake-args: '-DCMAKE_POLICY_VERSION_MINIMUM=3.5'
           - clang-version: 7
             release: llvm-project-7.1.0
-            extra-cmake-args: '-DCMAKE_POLICY_VERSION_MINIMUM=3.5'
           - clang-version: 8
             release: llvm-project-8.0.1
-            extra-cmake-args: '-DCLANG_ANALYZER_ENABLE_Z3_SOLVER=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5'
+            extra-cmake-args: '-DCLANG_ANALYZER_ENABLE_Z3_SOLVER=OFF'
           - clang-version: 9
             release: llvm-project-9.0.1
-            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5'
+            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
           - clang-version: 10
             release: llvm-project-10.0.1
-            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5'
+            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
           - clang-version: 11
             release: llvm-project-11.1.0.src
           - clang-version: 12
