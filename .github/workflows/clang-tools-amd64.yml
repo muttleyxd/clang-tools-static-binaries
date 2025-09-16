@@ -103,6 +103,11 @@ jobs:
           # https://github.com/llvm/llvm-project/issues/106521
           - clang-version: 17
             os: macos-arm
+          # Clang 5 is not building on mac anymore
+          - clang-version: 5
+            os: macosx
+          - clang-version: 5
+            os: macos-arm
     runs-on: ${{ matrix.runner }}
     env:
       COMMON_CMAKE_ARGS: '-DBUILD_SHARED_LIBS=OFF -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"'
