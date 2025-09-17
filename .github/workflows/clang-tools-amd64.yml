@@ -15,7 +15,7 @@ jobs:
       cancel-in-progress: true
     strategy:
       matrix:
-        clang-version: [ 18, 19, 20 ]
+        clang-version: [ 15, 16, 17, 18, 19, 20 ]
         os: [ linux, macosx, macos-arm, windows ]
         include:
           # Temporarily disabled versions for testing
@@ -48,12 +48,12 @@ jobs:
           #   release: llvm-project-13.0.0.src
           # - clang-version: 14
           #   release: llvm-project-14.0.0.src
-          # - clang-version: 15
-          #   release: llvm-project-15.0.2.src
-          # - clang-version: 16
-          #   release: llvm-project-16.0.3.src
-          # - clang-version: 17
-          #   release: llvm-project-17.0.4.src
+          - clang-version: 15
+            release: llvm-project-15.0.2.src
+          - clang-version: 16
+            release: llvm-project-16.0.3.src
+          - clang-version: 17
+            release: llvm-project-17.0.4.src
           - clang-version: 18
             release: llvm-project-18.1.8.src
           - clang-version: 19
@@ -98,12 +98,12 @@ jobs:
             extra-tar-args: '--exclude=${RELEASE}/clang/test/Driver/Inputs/* --exclude=${RELEASE}/libcxx/test/std/input.output/filesystems/Inputs/static_test_env/* --exclude=${RELEASE}/libclc/amdgcn-mesa3d'
             extra-tar-args-cfe: '--exclude=cfe-${version}.src/test/Driver/Inputs/*'
             arch: 'amd64'
-        # exclude:
+        exclude:
           # Clang 17 does not build on mac arm
           # See: https://github.com/llvm/llvm-project/pull/78704
           # https://github.com/llvm/llvm-project/issues/106521
-          # - clang-version: 17
-          #   os: macos-arm
+          - clang-version: 17
+            os: macos-arm
     runs-on: ${{ matrix.runner }}
     env:
       COMMON_CMAKE_ARGS: '-DBUILD_SHARED_LIBS=OFF -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"'
