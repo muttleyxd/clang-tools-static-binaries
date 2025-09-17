@@ -167,18 +167,27 @@ jobs:
         # Remove existing CMake installed via brew
         brew uninstall cmake || true
         # Download and install CMake 3.5.2 binary
-        if [[ "${{ matrix.os }}" == "macos-arm" ]]; then
-          # For ARM Macs, we'll use the Intel binary with Rosetta
-          wget -q https://cmake.org/files/v3.5/cmake-3.5.2-Darwin-x86_64.tar.gz
-          tar -xzf cmake-3.5.2-Darwin-x86_64.tar.gz
-        else
-          wget -q https://cmake.org/files/v3.5/cmake-3.5.2-Darwin-x86_64.tar.gz
-          tar -xzf cmake-3.5.2-Darwin-x86_64.tar.gz
-        fi
+        echo "Downloading CMake 3.5.2 for macOS..."
+        wget -q https://cmake.org/files/v3.5/cmake-3.5.2-Darwin-x86_64.tar.gz
+        tar -xzf cmake-3.5.2-Darwin-x86_64.tar.gz
+
+        # Copy the complete CMake installation (binaries, modules, etc.)
+        echo "Installing CMake binaries and modules..."
         sudo cp -r cmake-3.5.2-Darwin-x86_64/CMake.app/Contents/bin/* /usr/local/bin/
+        sudo mkdir -p /usr/local/share
+        sudo cp -r cmake-3.5.2-Darwin-x86_64/CMake.app/Contents/share/* /usr/local/share/
+
+        # Set CMAKE_ROOT environment variable
+        export CMAKE_ROOT="/usr/local/share/cmake-3.5"
+        echo "CMAKE_ROOT=/usr/local/share/cmake-3.5" >> $GITHUB_ENV
+
         # Add to PATH
         export PATH="/usr/local/bin:$PATH"
         echo "/usr/local/bin" >> $GITHUB_PATH
+
+        # Verify installation
+        echo "Verifying CMake installation..."
+        ls -la /usr/local/share/cmake-3.5/Modules/ | head -10
       shell: bash
     - name: Debug - Print CMake version
       run: cmake --version
