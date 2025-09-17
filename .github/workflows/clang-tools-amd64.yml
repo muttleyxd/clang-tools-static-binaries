@@ -116,6 +116,81 @@ jobs:
       run: |
         uname -a || systeminfo
       if: ${{ matrix.os != 'windows' }}
+    - name: Install CMake 3.5.2 (Windows)
+      if: ${{ matrix.os == 'windows' }}
+      run: |
+        # Download CMake 3.5.2 binary directly
+        $url = "https://cmake.org/files/v3.5/cmake-3.5.2-win32-x86.zip"
+        $output = "cmake-3.5.2-win32-x86.zip"
+        Write-Host "Downloading CMake 3.5.2..."
+        Invoke-WebRequest -Uri $url -OutFile $output
+
+        # Extract to a local directory
+        Write-Host "Extracting CMake..."
+        Expand-Archive -Path $output -DestinationPath "." -Force
+
+        # Add to PATH
+        $cmakePath = (Get-Location).Path + "\cmake-3.5.2-win32-x86\bin"
+        Write-Host "Adding to PATH: $cmakePath"
+        $env:PATH = "$cmakePath;$env:PATH"
+        echo $cmakePath | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+        # Verify installation
+        Write-Host "CMake installed. Testing..."
+        & "$cmakePath\cmake.exe" --version
+      shell: powershell
+    - name: Install CMake 3.5.2 (Linux)
+      if: ${{ matrix.os == 'linux' }}
+      run: |
+        # Remove existing CMake
+        sudo apt-get remove -y cmake || true
+        # Install build dependencies and missing libraries
+        sudo apt-get update
+        sudo apt-get install -y build-essential libssl-dev libcurl4-openssl-dev
+        # Try to install the missing libidn library
+        sudo apt-get install -y libidn11 || true
+        # Download and build CMake 3.5.2 from source to avoid library conflicts
+        wget -q https://cmake.org/files/v3.5/cmake-3.5.2.tar.gz
+        tar -xzf cmake-3.5.2.tar.gz
+        cd cmake-3.5.2
+        # Configure and build with minimal dependencies
+        ./configure --prefix=/usr/local --no-qt-gui --no-system-libs
+        make -j$(nproc)
+        sudo make install
+        # Verify installation path
+        export PATH="/usr/local/bin:$PATH"
+        echo "/usr/local/bin" >> $GITHUB_PATH
+      shell: bash
+    - name: Install CMake 3.5.2 (macOS)
+      if: ${{ matrix.os == 'macosx' || matrix.os == 'macos-arm' }}
+      run: |
+        # Remove existing CMake installed via brew
+        brew uninstall cmake || true
+        # Download and install CMake 3.5.2 binary
+        echo "Downloading CMake 3.5.2 for macOS..."
+        wget -q https://cmake.org/files/v3.5/cmake-3.5.2-Darwin-x86_64.tar.gz
+        tar -xzf cmake-3.5.2-Darwin-x86_64.tar.gz
+
+        # Copy the complete CMake installation (binaries, modules, etc.)
+        echo "Installing CMake binaries and modules..."
+        sudo cp -r cmake-3.5.2-Darwin-x86_64/CMake.app/Contents/bin/* /usr/local/bin/
+        sudo mkdir -p /usr/local/share
+        sudo cp -r cmake-3.5.2-Darwin-x86_64/CMake.app/Contents/share/* /usr/local/share/
+
+        # Set CMAKE_ROOT environment variable
+        export CMAKE_ROOT="/usr/local/share/cmake-3.5"
+        echo "CMAKE_ROOT=/usr/local/share/cmake-3.5" >> $GITHUB_ENV
+
+        # Add to PATH
+        export PATH="/usr/local/bin:$PATH"
+        echo "/usr/local/bin" >> $GITHUB_PATH
+
+        # Verify installation
+        echo "Verifying CMake installation..."
+        ls -la /usr/local/share/cmake-3.5/Modules/ | head -10
+      shell: bash
+    - name: Debug - Print CMake version
+      run: cmake --version
     - name: download patches
       # we download a tarball of this repo, as the presence of a .git directory leaks
       # the commit hash of this repository into the clang binaries
