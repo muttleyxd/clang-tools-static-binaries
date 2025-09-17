@@ -116,10 +116,49 @@ jobs:
       run: |
         uname -a || systeminfo
       if: ${{ matrix.os != 'windows' }}
-    - name: Setup CMake 3.5.2
-      uses: jwlawson/actions-setup-cmake@v2
-      with:
-        cmake-version: '3.5.2'
+    - name: Install CMake 3.5.2 (Windows)
+      if: ${{ matrix.os == 'windows' }}
+      run: |
+        # Remove existing CMake to avoid conflicts
+        choco uninstall cmake -y --remove-dependencies || true
+        # Install specific version using chocolatey
+        choco install cmake.install --version=3.5.2 -y --force
+        # Add to PATH for current session
+        $env:PATH = "C:\Program Files\CMake\bin;$env:PATH"
+        echo "C:\Program Files\CMake\bin" >> $env:GITHUB_PATH
+      shell: powershell
+    - name: Install CMake 3.5.2 (Linux)
+      if: ${{ matrix.os == 'linux' }}
+      run: |
+        # Remove existing CMake
+        sudo apt-get remove -y cmake || true
+        # Download and install CMake 3.5.2 binary
+        wget -q https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.tar.gz
+        tar -xzf cmake-3.5.2-Linux-x86_64.tar.gz
+        sudo cp -r cmake-3.5.2-Linux-x86_64/* /usr/local/
+        # Verify installation path
+        export PATH="/usr/local/bin:$PATH"
+        echo "/usr/local/bin" >> $GITHUB_PATH
+      shell: bash
+    - name: Install CMake 3.5.2 (macOS)
+      if: ${{ matrix.os == 'macosx' || matrix.os == 'macos-arm' }}
+      run: |
+        # Remove existing CMake installed via brew
+        brew uninstall cmake || true
+        # Download and install CMake 3.5.2 binary
+        if [[ "${{ matrix.os }}" == "macos-arm" ]]; then
+          # For ARM Macs, we'll use the Intel binary with Rosetta
+          wget -q https://cmake.org/files/v3.5/cmake-3.5.2-Darwin-x86_64.tar.gz
+          tar -xzf cmake-3.5.2-Darwin-x86_64.tar.gz
+        else
+          wget -q https://cmake.org/files/v3.5/cmake-3.5.2-Darwin-x86_64.tar.gz
+          tar -xzf cmake-3.5.2-Darwin-x86_64.tar.gz
+        fi
+        sudo cp -r cmake-3.5.2-Darwin-x86_64/CMake.app/Contents/bin/* /usr/local/bin/
+        # Add to PATH
+        export PATH="/usr/local/bin:$PATH"
+        echo "/usr/local/bin" >> $GITHUB_PATH
+      shell: bash
     - name: Debug - Print CMake version
       run: cmake --version
     - name: download patches
