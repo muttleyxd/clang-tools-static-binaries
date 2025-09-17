@@ -116,6 +116,12 @@ jobs:
       run: |
         uname -a || systeminfo
       if: ${{ matrix.os != 'windows' }}
+    - name: Setup CMake 3.5.2
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.5.2'
+    - name: Debug - Print CMake version
+      run: cmake --version
     - name: download patches
       # we download a tarball of this repo, as the presence of a .git directory leaks
       # the commit hash of this repository into the clang binaries
