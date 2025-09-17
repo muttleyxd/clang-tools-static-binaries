@@ -132,10 +132,19 @@ jobs:
       run: |
         # Remove existing CMake
         sudo apt-get remove -y cmake || true
-        # Download and install CMake 3.5.2 binary
-        wget -q https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.tar.gz
-        tar -xzf cmake-3.5.2-Linux-x86_64.tar.gz
-        sudo cp -r cmake-3.5.2-Linux-x86_64/* /usr/local/
+        # Install build dependencies and missing libraries
+        sudo apt-get update
+        sudo apt-get install -y build-essential libssl-dev libcurl4-openssl-dev
+        # Try to install the missing libidn library
+        sudo apt-get install -y libidn11 || true
+        # Download and build CMake 3.5.2 from source to avoid library conflicts
+        wget -q https://cmake.org/files/v3.5/cmake-3.5.2.tar.gz
+        tar -xzf cmake-3.5.2.tar.gz
+        cd cmake-3.5.2
+        # Configure and build with minimal dependencies
+        ./configure --prefix=/usr/local --no-qt-gui --no-system-libs
+        make -j$(nproc)
+        sudo make install
         # Verify installation path
         export PATH="/usr/local/bin:$PATH"
         echo "/usr/local/bin" >> $GITHUB_PATH
