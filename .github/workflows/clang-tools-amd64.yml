@@ -120,12 +120,13 @@ jobs:
       if: ${{ matrix.os == 'windows' }}
       run: |
         # Remove existing CMake to avoid conflicts
-        choco uninstall cmake -y --remove-dependencies || true
+        try { choco uninstall cmake -y --remove-dependencies } catch { Write-Host "No existing cmake to remove" }
+        try { choco uninstall cmake.install -y --remove-dependencies } catch { Write-Host "No existing cmake.install to remove" }
         # Install specific version using chocolatey
         choco install cmake.install --version=3.5.2 -y --force
         # Add to PATH for current session
         $env:PATH = "C:\Program Files\CMake\bin;$env:PATH"
-        echo "C:\Program Files\CMake\bin" >> $env:GITHUB_PATH
+        echo "C:\Program Files\CMake\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       shell: powershell
     - name: Install CMake 3.5.2 (Linux)
       if: ${{ matrix.os == 'linux' }}
