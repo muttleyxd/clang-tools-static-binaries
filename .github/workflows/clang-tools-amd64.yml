@@ -15,7 +15,7 @@ jobs:
       cancel-in-progress: true
     strategy:
       matrix:
-        clang-version: [ 12, 12.0.1, 13, 14, 15, 16, 17, 18, 19, 20 ]
+        clang-version: [ 9, 10, 11, 12, 12.0.1, 13, 14, 15, 16, 17, 18, 19, 20 ]
         os: [ linux, macosx, macos-arm, windows ]
         include:
           # Temporarily disabled versions for testing
@@ -32,14 +32,14 @@ jobs:
           # - clang-version: 8
           #   release: llvm-project-8.0.1
           #   extra-cmake-args: '-DCLANG_ANALYZER_ENABLE_Z3_SOLVER=OFF'
-          # - clang-version: 9
-          #   release: llvm-project-9.0.1
-          #   extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
-          # - clang-version: 10
-          #   release: llvm-project-10.0.1
-          #   extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
-          # - clang-version: 11
-          #   release: llvm-project-11.1.0.src
+          - clang-version: 9
+            release: llvm-project-9.0.1
+            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
+          - clang-version: 10
+            release: llvm-project-10.0.1
+            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
+          - clang-version: 11
+            release: llvm-project-11.1.0.src
           - clang-version: 12
             release: llvm-project-12.0.0.src
           - clang-version: 12.0.1
