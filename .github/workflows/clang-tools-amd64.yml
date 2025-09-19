@@ -15,30 +15,34 @@ jobs:
       cancel-in-progress: true
     strategy:
       matrix:
-        clang-version: [ 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12.0.1, 13, 14, 15, 16, 17, 18, 19, 20 ]
+        clang-version: [ 12, 12.0.1, 13, 14, 15, 16, 17, 18, 19, 20 ]
         os: [ linux, macosx, macos-arm, windows ]
         include:
-          - clang-version: 3.9
-            release: llvm-project-3.9.1
-          - clang-version: 4
-            release: llvm-project-4.0.1
-          - clang-version: 5
-            release: llvm-project-5.0.2
-          - clang-version: 6
-            release: llvm-project-6.0.1
-          - clang-version: 7
-            release: llvm-project-7.1.0
-          - clang-version: 8
-            release: llvm-project-8.0.1
-            extra-cmake-args: '-DCLANG_ANALYZER_ENABLE_Z3_SOLVER=OFF'
-          - clang-version: 9
-            release: llvm-project-9.0.1
-            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
-          - clang-version: 10
-            release: llvm-project-10.0.1
-            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
-          - clang-version: 11
-            release: llvm-project-11.1.0.src
+          # Temporarily disabled versions for testing
+          # - clang-version: 3.9
+          #   release: llvm-project-3.9.1
+          # - clang-version: 4
+          #   release: llvm-project-4.0.1
+          # - clang-version: 5
+          #   release: llvm-project-5.0.2
+          # - clang-version: 6
+          #   release: llvm-project-6.0.1
+          # - clang-version: 7
+          #   release: llvm-project-7.1.0
+          # - clang-version: 8
+          #   release: llvm-project-8.0.1
+          #   extra-cmake-args: '-DCLANG_ANALYZER_ENABLE_Z3_SOLVER=OFF'
+          # - clang-version: 9
+          #   release: llvm-project-9.0.1
+          #   extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
+          # NOTE: Version 9 fails with CMake 4 compatibility issues
+          # - clang-version: 10
+          #   release: llvm-project-10.0.1
+          #   extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
+          # NOTE: Version 10 also fails with CMake 4 compatibility issues
+          # - clang-version: 11
+          #   release: llvm-project-11.1.0.src
+          # NOTE: Version 11 also fails with CMake 4 compatibility issues
           - clang-version: 12
             release: llvm-project-12.0.0.src
           - clang-version: 12.0.1
