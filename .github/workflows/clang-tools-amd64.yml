@@ -15,7 +15,7 @@ jobs:
       cancel-in-progress: true
     strategy:
       matrix:
-        clang-version: [ 10, 11, 12, 12.0.1, 13, 14, 15, 16, 17, 18, 19, 20 ]
+        clang-version: [ 11, 12, 12.0.1, 13, 14, 15, 16, 17, 18, 19, 20 ]
         os: [ linux, macosx, macos-arm, windows ]
         include:
           # Temporarily disabled versions for testing
@@ -36,9 +36,10 @@ jobs:
           #   release: llvm-project-9.0.1
           #   extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
           # NOTE: Version 9 fails with CMake 4 compatibility issues
-          - clang-version: 10
-            release: llvm-project-10.0.1
-            extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
+          # - clang-version: 10
+          #   release: llvm-project-10.0.1
+          #   extra-cmake-args: '-DLLVM_ENABLE_Z3_SOLVER=OFF'
+          # NOTE: Version 10 also fails with CMake 4 compatibility issues
           - clang-version: 11
             release: llvm-project-11.1.0.src
           - clang-version: 12
