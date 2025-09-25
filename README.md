@@ -21,6 +21,13 @@ These binaries aim to:
 - Fork this repository and run GitHub actions on your behalf
 - Build manually using steps using commands from [.github/workflows](https://github.com/muttleyxd/clang-format-static-binaries/tree/master/.github/workflows)
 
+## Ecosystem
+
+Ecosystem based on this static pre-built binaries:
+
+- <https://github.com/NiceLabs/clang-format-action> \
+   Lint C/C++ code using clang-format in GitHub Actions
+
 ## More clang-tools
 
 If there's any interest I could add more tools, or a build for new OS (ex. FreeBSD)
